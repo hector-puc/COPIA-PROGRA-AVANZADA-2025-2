@@ -7,7 +7,7 @@ __pycache__
 
 /config/
 /data/
-/test_publicos/
+/tests_publicos/
 README_INICIAL.md
 visualizador.py
 Enunciado.pdf
