@@ -1,0 +1,13 @@
+__pycache__
+.ipynb_checkpoints
+.idea
+.DS_Store
+*.pyc
+.vscode
+
+/config/
+/data/
+/test_publicos/
+README_INICIAL.md
+visualizador.py
+Enunciado.pdf
