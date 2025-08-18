@@ -16,8 +16,11 @@ class Tablero:
     def cargar_tablero(self, archivo:str) -> None:
         ruta = os.path.join("config", archivo)
 
-        self.tablero = [] 
-    
+        self.tablero = []
+        self.diccionario = []
+        self.diccionario_original = []
+        self.movimientos = 0
+        self.estado = False
         
 
         data = open(ruta, "r", encoding="utf-8")
@@ -56,7 +59,7 @@ class Tablero:
             
             self.diccionario.append(cada_fila)
         
-        self.diccionario_original = copy.deepcopy(self.diccionario)
+        #self.diccionario_original = copy.deepcopy(self.diccionario)
 
     def mostrar_tablero(self) -> None:
         visualizador.imprimir_tablero(self.tablero)
@@ -101,38 +104,47 @@ class Tablero:
         return True
         
     def validar(self) -> bool:
-        filas = len(self.tablero) - 1
-        columnas = len(self.tablero[0]) - 1
 
+
+        """""
+        filas = self.filas  
+        columnas = self.columnas 
+
+        if not self.tablero or not self.diccionario:
+            return False
+        
 #filas
         for i in range(filas):
-            obj = self.tablero[i][columnas]
-            if obj is not None:
+
+            objetivo = self.diccionario[i][columnas]
+            if objetivo is not None:
                 suma = 0
                 for j in range(columnas):
-                    casilla = self.tablero[i][j]
-                    if casilla["habilitada"]:
+                    casilla = self.diccionario[i][j]
+                    if isinstance(casilla, dict) and casilla["habilitada"] and casilla["valor"] is not None:
                         suma += casilla["valor"]
                 
-                if suma != obj:
+                if suma != objetivo:
+                    self.estado = False
                     return False
 
 #columnas
         for j in range(columnas):
-            obj = self.tablero[filas][j]
-            if obj is not None:
+            objetivo = self.diccionario[filas][j]
+            if objetivo is not None:
                 suma = 0
                 for i in range(filas):
-                    casilla = self.tablero[i][j]
-                    if casilla["habilitada"]:
+                    casilla = self.diccionario[i][j]
+                    if isinstance(casilla, dict) and casilla["habilitada"] and casilla["valor"] is not None:
                         suma += casilla["valor"]
                 
-                if suma != obj:
+                if suma != objetivo:
+                    self.estado = False
                     return False
         
         self.estado = True
         return True
-    
+    """""
 #BACKTRACKING https://www.geeksforgeeks.org/dsa/introduction-to-backtracking-2
 
     #def encontrar_solucion(self) -> Tablero:
