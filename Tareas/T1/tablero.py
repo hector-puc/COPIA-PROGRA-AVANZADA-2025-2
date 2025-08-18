@@ -1,6 +1,6 @@
 import os
 import visualizador
-
+import copy
 
 class Tablero:
 
@@ -8,50 +8,97 @@ class Tablero:
         self.tablero = []
         self.movimientos = 0
         self.estado = False
-
+        self.filas = 0
+        self.columnas = 0
+        self.diccionario = []
+        self.diccionario_original = []
 
     def cargar_tablero(self, archivo:str) -> None:
         ruta = os.path.join("config", archivo)
 
         self.tablero = [] 
-
+    
+        
 
         data = open(ruta, "r", encoding="utf-8")
         info = data.readlines()
         data.close()
 
-        dimensiones = info[0].strip().split(" ")
+        dimensiones = info[0].strip().split()
         filas = int(dimensiones[0])
         columnas = int(dimensiones[1])
 
-        for i in range(filas + 1):
-            fila = info[i + 1].strip().split()
-            self.tablero.append(fila)
-        
-        #self.tablero.append(fila)
+        self.filas = filas
+        self.columnas = columnas
 
+        #TABLERO ORIGINAL:
+
+        for i in range(filas + 1):
+            original = info[i +1].strip().split(" ")
+            self.tablero.append(original)
+
+
+# PARA MODIFICAR LA CASILLA:
+
+        for i in range(filas + 1):
+            cada_fila = []
+            for j in range(columnas + 1):
+                casilla = self.tablero[i][j]
+                if casilla == ".":
+                    valor = None
+                else:
+                    valor = int(casilla)
+
+                if i < filas and j < columnas:
+                    cada_fila.append({"valor": valor, "habilitada": True})
+                else:
+                    cada_fila.append(valor)
+            
+            self.diccionario.append(cada_fila)
+        
+        self.diccionario_original = copy.deepcopy(self.diccionario)
 
     def mostrar_tablero(self) -> None:
         visualizador.imprimir_tablero(self.tablero)
 
+
+# TRY, EXCEPT https://docs.python.org/es/3.13/tutorial/errors.html
+
     def modificar_casilla(self, fila:int, columna:int) -> bool:
-
-        fila = int(fila)
-        columna = int(columna)
-
-        if fila < 0 or fila >= len(self.tablero):
+        try:
+            filas = int(fila)
+            columnas = int(columna)
+        except ValueError:
             return False
-        if columna < 0 or columna >= len(self.tablero[0]):
+        
+
+        if filas < 0 or filas >= self.filas:
+            return False
+        if columnas < 0 or columnas >= self.columnas:
             return False
     
-        casilla = self.tablero[fila][columna]
+        casilla = self.diccionario[filas][columnas]
         
         if not isinstance(casilla, dict):
             return False
+        
+        if casilla["valor"] is None:
+            return False
+
+        habilitado = not casilla["habilitada"]
+        casilla["habilitada"] = habilitado
+        
+        valor = casilla["valor"]
+
+        
+        if habilitado:
+            self.tablero[filas][columnas] = str(valor)
         else:
-            casilla["habilitada"] = not casilla["habilitada"]
-            self.movimientos += 1
-            return True
+            self.tablero[filas][columnas] = "X" + str(valor)
+        
+        self.movimientos += 1
+
+        return True
         
     def validar(self) -> bool:
         filas = len(self.tablero) - 1
