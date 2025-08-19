@@ -41,24 +41,6 @@ class Tablero:
             self.tablero.append(original)
 
 
-# PARA MODIFICAR LA CASILLA:
-
-        for i in range(filas + 1):
-            cada_fila = []
-            for j in range(columnas + 1):
-                casilla = self.tablero[i][j]
-                if casilla == ".":
-                    valor = None
-                else:
-                    valor = int(casilla)
-
-                if i < filas and j < columnas:
-                    cada_fila.append({"valor": valor, "habilitada": True})
-                else:
-                    cada_fila.append(valor)
-            
-            self.diccionario.append(cada_fila)
-        
         #self.diccionario_original = copy.deepcopy(self.diccionario)
 
     def mostrar_tablero(self) -> None:
@@ -80,71 +62,64 @@ class Tablero:
         if columnas < 0 or columnas >= self.columnas:
             return False
     
-        casilla = self.diccionario[filas][columnas]
-        
-        if not isinstance(casilla, dict):
-            return False
-        
-        if casilla["valor"] is None:
-            return False
 
-        habilitado = not casilla["habilitada"]
-        casilla["habilitada"] = habilitado
-        
-        valor = casilla["valor"]
-
-        
-        if habilitado:
-            self.tablero[filas][columnas] = str(valor)
+        if casilla.startswith("X"):
+            self.tablero[filas][columnas] = casilla[1:]
         else:
-            self.tablero[filas][columnas] = "X" + str(valor)
+            self.tablero[filas][columnas] = "X" + casilla
         
         self.movimientos += 1
 
-        return True
-        
+
     def validar(self) -> bool:
-
-
-        """""
-        filas = self.filas  
-        columnas = self.columnas 
-
-        if not self.tablero or not self.diccionario:
-            return False
-        
-#filas
-        for i in range(filas):
-
-            objetivo = self.diccionario[i][columnas]
-            if objetivo is not None:
+        # filas
+        for i in range(self.filas):
+            objetivo = self.tablero[i][self.columnas].strip()
+            if objetivo != "." and objetivo != "":
+                
+                objetivo = int(objetivo)
+            
                 suma = 0
-                for j in range(columnas):
-                    casilla = self.diccionario[i][j]
-                    if isinstance(casilla, dict) and casilla["habilitada"] and casilla["valor"] is not None:
-                        suma += casilla["valor"]
+
+                for j in range(self.columnas):
+                    casilla = self.tablero[i][j].strip()
+                    if casilla.startswith("X"):
+                        continue
+                    if casilla == "." or casilla == "":
+                        continue
+                    valor_suma = int(casilla)
+                    suma += valor_suma
                 
                 if suma != objetivo:
                     self.estado = False
                     return False
 
-#columnas
-        for j in range(columnas):
-            objetivo = self.diccionario[filas][j]
-            if objetivo is not None:
+            # columnas
+        for j in range(self.columnas):
+            objetivo = self.tablero[self.filas][j].strip()
+            if objetivo != "." and objetivo != "":
+                objetivo = int(objetivo)
+            
                 suma = 0
-                for i in range(filas):
-                    casilla = self.diccionario[i][j]
-                    if isinstance(casilla, dict) and casilla["habilitada"] and casilla["valor"] is not None:
-                        suma += casilla["valor"]
+
+                for i in range(self.filas):
+                    casilla = self.tablero[i][j].strip()
+                    if casilla.startswith("X"):
+                        continue
+                    if casilla == "." or casilla == "":
+                        continue
+                    valor_suma = int(casilla)
+                    suma += valor_suma
                 
                 if suma != objetivo:
                     self.estado = False
                     return False
-        
+            
         self.estado = True
         return True
-    """""
+
+
+
 #BACKTRACKING https://www.geeksforgeeks.org/dsa/introduction-to-backtracking-2
 
     #def encontrar_solucion(self) -> Tablero:
