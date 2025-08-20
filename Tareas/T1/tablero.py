@@ -56,69 +56,102 @@ class Tablero:
         except ValueError:
             return False
         
+        if self.tablero == []:
+            return False
 
         if filas < 0 or filas >= self.filas:
             return False
         if columnas < 0 or columnas >= self.columnas:
             return False
     
-
-        if casilla.startswith("X"):
-            self.tablero[filas][columnas] = casilla[1:]
-        else:
-            self.tablero[filas][columnas] = "X" + casilla
         
+        casilla = self.tablero[fila][columna].strip()
+    
+        if isinstance(casilla, str):
+
+            if casilla.startswith("X"):
+                self.tablero[filas][columnas] = casilla[1:]
+            elif casilla == "." or casilla == "":
+                return False
+            else:
+                self.tablero[filas][columnas] = "X" + casilla
+        else:
+            self.tablero[filas][columnas] = "X" + str(casilla)
+
         self.movimientos += 1
-
-
-    def validar(self) -> bool:
-        # filas
-        for i in range(self.filas):
-            objetivo = self.tablero[i][self.columnas].strip()
-            if objetivo != "." and objetivo != "":
-                
-                objetivo = int(objetivo)
-            
-                suma = 0
-
-                for j in range(self.columnas):
-                    casilla = self.tablero[i][j].strip()
-                    if casilla.startswith("X"):
-                        continue
-                    if casilla == "." or casilla == "":
-                        continue
-                    valor_suma = int(casilla)
-                    suma += valor_suma
-                
-                if suma != objetivo:
-                    self.estado = False
-                    return False
-
-            # columnas
-        for j in range(self.columnas):
-            objetivo = self.tablero[self.filas][j].strip()
-            if objetivo != "." and objetivo != "":
-                objetivo = int(objetivo)
-            
-                suma = 0
-
-                for i in range(self.filas):
-                    casilla = self.tablero[i][j].strip()
-                    if casilla.startswith("X"):
-                        continue
-                    if casilla == "." or casilla == "":
-                        continue
-                    valor_suma = int(casilla)
-                    suma += valor_suma
-                
-                if suma != objetivo:
-                    self.estado = False
-                    return False
-            
-        self.estado = True
         return True
 
 
+    def validar(self) -> bool:
+        
+        if not self.tablero or not self.tablero[0]: #si no existe tablero o esta vacio
+            self.estado = False
+            return False
+
+        
+        filas_sin_adicional = len(self.tablero) - 1        
+        columnas_sin_adicional = len(self.tablero[0]) - 1     
+
+        
+        for i in range(filas_sin_adicional):
+            objetivo_str = self.tablero[i][columnas_sin_adicional]
+            if objetivo_str != "." and objetivo_str != "":
+                try:
+                    objetivo = int(objetivo_str)
+                except ValueError:
+                    self.estado = False
+                    return False
+
+
+                suma = 0
+                for j in range(columnas_sin_adicional):
+                    casilla = self.tablero[i][j]
+                    
+                    if casilla == "." or casilla == "" or (isinstance(casilla, str) and casilla.startswith("X")):
+                        continue
+                    try:
+                        suma += int(casilla)
+                    except ValueError:
+                        self.estado = False
+                        return False
+
+
+                if suma != objetivo:
+                    self.estado = False
+                    return False
+
+        
+        for j in range(columnas_sin_adicional):
+            objetivo_str = self.tablero[filas_sin_adicional][j]
+            if objetivo_str != "." and objetivo_str != "":
+
+                try:
+                    objetivo = int(objetivo_str)
+                
+                except ValueError:
+                    self.estado = False
+                    return False
+
+                suma = 0
+                for i in range(filas_sin_adicional):
+                    casilla = self.tablero[i][j]
+                    if casilla == "." or casilla == "" or (isinstance(casilla, str) and casilla.startswith("X")):
+                        continue
+                    
+                    try:
+                        suma += int(casilla)
+                    
+                    except ValueError:
+                        self.estado = False
+                        return False
+
+                if suma != objetivo:
+                    self.estado = False
+                    return False
+
+        
+        self.estado = True
+        return True
 
 #BACKTRACKING https://www.geeksforgeeks.org/dsa/introduction-to-backtracking-2
 
