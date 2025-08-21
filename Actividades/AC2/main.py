@@ -7,15 +7,33 @@ from utilidades import Anime  # IMPORTANT: Debes utilizar esta nametupled
 #       Parte I - Cargar datos      #
 #####################################
 def cargar_animes(ruta_archivo: str) -> list:
-    # TODO: Completar
-    return
+    with open(ruta_archivo, 'r', encoding='utf-8') as lista:
+        ListaAnime = lista.readlines()
+        carga = []
+        for i in ListaAnime:
+            linea = i.strip()
+            datos = linea.split(',')
+            nombre, capitulos, puntaje, estreno, estudio, *generos = datos
+            generos = set(generos[0].split(";"))
+            desarrollo = Anime(
+                nombre = str(nombre),
+                capitulos = int(capitulos),
+                puntaje = int(puntaje),
+                estreno = int(estreno),
+                estudio = str(estudio),
+                generos = generos
+            )
+            carga.append(desarrollo)
+        return carga
+    
+
 
 
 #####################################
 #        Parte II - Consultas       #
 #####################################
 def animes_por_estreno(animes: list) -> dict:
-    # TODO: Completar
+    
     return
 
 
