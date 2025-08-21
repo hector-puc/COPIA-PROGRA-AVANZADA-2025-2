@@ -33,17 +33,32 @@ def cargar_animes(ruta_archivo: str) -> list:
 #        Parte II - Consultas       #
 #####################################
 def animes_por_estreno(animes: list) -> dict:
-    
-    return
+    animes_estreno = {}
+    for i in animes:
+        anho = i.estreno
+        if anho not in animes_estreno:
+            animes_estreno[anho] = [i.nombre]
+        else:
+            animes_estreno[anho].append(i.nombre)
+
+    return animes_estreno
 
 
 def descartar_animes(generos_descartados: set, animes: list) -> list:
-    # TODO: Completar
-    return
+    sin_descartar = []
+    for i in animes:
+        if not i.generos.intersection(generos_descartados):
+            sin_descartar.append(i.nombre)
+    return sin_descartar
 
 
 def resumen_animes_por_ver(*animes: Anime) -> dict:
-    # TODO: Completar
+    if not animes:
+        return {
+            'puntaje promedio': 0.0,
+            'capitulos total' : 0,
+            'generos' :set()
+        }
     return
 
 
