@@ -37,9 +37,10 @@ class Tablero:
         #TABLERO ORIGINAL:
 
         for i in range(filas + 1):
+            if i +1 >= len(info):
+                break
             original = info[i +1].strip().split(" ")
             self.tablero.append(original)
-
 
         #self.diccionario_original = copy.deepcopy(self.diccionario)
 
@@ -155,5 +156,47 @@ class Tablero:
 
 #BACKTRACKING https://www.geeksforgeeks.org/dsa/introduction-to-backtracking-2
 
-    #def encontrar_solucion(self) -> Tablero:
-    #    pass
+    def encontrar_solucion(self):
+        
+        tablero_copia = copy.deepcopy(self.tablero)
+
+        
+        posiciones_jugables = []
+        
+        for i in range(len(tablero_copia) - 1):
+            for j in range(len(tablero_copia[0]) - 1):
+                if tablero_copia[i][j] != "." and tablero_copia[i][j] != "":
+                    posiciones_jugables.append((i, j))
+        
+
+        def backtrack(indice_posicion):
+            
+            if indice_posicion == len(posiciones_jugables):
+                
+                tablero_temporal = Tablero()
+                tablero_temporal.tablero = tablero_copia
+                return tablero_temporal.validar()
+
+            fila_actual, columna_actual = posiciones_jugables[indice_posicion]
+            valor_original = str(tablero_copia[fila_actual][columna_actual])
+
+            #dejar la casilla igual
+            if backtrack(indice_posicion + 1):
+                return True
+
+            #desahibilitar
+            tablero_copia[fila_actual][columna_actual] = "X" + str(valor_original)
+
+            if backtrack(indice_posicion + 1):
+                return True
+
+            #restaurar casilla
+            tablero_copia[fila_actual][columna_actual] = valor_original
+            return False
+
+        if backtrack(0):
+            tablero_resuelto = Tablero()
+            tablero_resuelto.tablero = tablero_copia
+            return tablero_resuelto
+        else:
+            return None

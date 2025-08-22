@@ -15,6 +15,8 @@ class DCCasillas:
         tablero_info = archivo.readlines()
         archivo.close()
 
+        self.total_tableros =  int(tablero_info[0].strip())
+
         if not tablero_info:
             return 
         
@@ -44,6 +46,12 @@ class DCCasillas:
 
         # CREAR ARCHIVO https://www.pythontutorial.net/python-basics/python-create-text-file
 
+        if not isinstance(self.usuario, str) or not self.usuario.strip(): #sin usuario
+            return False
+        
+        if not isinstance(self.tableros, list) or len(self.tableros) == 0: # sin tablero
+            return False
+    
         carpeta = "data"
         nombre = f"{self.usuario}.txt"
         ruta_archivo = os.path.join(carpeta, nombre)
