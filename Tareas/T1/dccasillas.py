@@ -80,7 +80,7 @@ class DCCasillas:
         
 
         nombre = f"{self.usuario}.txt"
-        ruta_archivo = os.path.join(path, nombre)
+        ruta_archivo = os.path.join(path) #cambie esta linea de (path, nombre) a (path), en casod de error
         
         with open(ruta_archivo, "r", encoding="utf-8") as archivo:
 

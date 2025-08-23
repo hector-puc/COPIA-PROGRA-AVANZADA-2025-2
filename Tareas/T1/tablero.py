@@ -1,5 +1,5 @@
 import os
-import visualizador
+from visualizador import imprimir_tablero
 import copy
 
 class Tablero:
@@ -45,7 +45,7 @@ class Tablero:
         #self.diccionario_original = copy.deepcopy(self.diccionario)
 
     def mostrar_tablero(self) -> None:
-        visualizador.imprimir_tablero(self.tablero)
+        imprimir_tablero(self.tablero)
 
 
 # TRY, EXCEPT https://docs.python.org/es/3.13/tutorial/errors.html
