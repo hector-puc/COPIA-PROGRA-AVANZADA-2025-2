@@ -11,8 +11,13 @@ while not usuario:
 archivo_temporal = ""
 
 while archivo_temporal == "":
-      configuracion_tablero = str(input("Ingrese la configuración del tablero (nombre del archivo con el .txt): ")).strip()
-
+      configuracion_tablero = str(input("Ingrese la configuración del tablero: ")).strip()
+      if not configuracion_tablero:
+            print("El nombre del archivo no puede estar vacío. Inténtelo de nuevo.")
+            continue
+      elif not configuracion_tablero.lower().endswith(".txt"):
+            configuracion_tablero += ".txt"
+            
       #revisar si el archivo existe https://stackoverflow.com/questions/2259382/pythonic-way-to-check-if-a-file-exists
 
       ruta = os.path.join("config", configuracion_tablero)
@@ -38,9 +43,13 @@ def menu_juego():
             return
 
     while condicion:
+      tableros_resueltos = 0
+      for i in import_dccasillas.tableros:
+            if i.estado:
+                tableros_resueltos += 1
       print(f"""
     ¡Bienvenido a DCCasillas! 
-    Usuario: {usuario}, Puntaje: {puntaje} 
+    Usuario: {usuario}, Puntaje: {import_dccasillas.puntaje} 
     Numero de tableros resueltos: {tableros_resueltos}/{tableros_totales}
     *** Menú de juego ***
     [1] Iniciar nuevo juego
@@ -63,13 +72,28 @@ def menu_juego():
                  tablero_juego.mostrar_tablero()
                  menu_acciones()
       elif accion == "2":
-            if import_dccasillas.tablero_actual is not None:
-                  tablero_juego = import_dccasillas.tableros[import_dccasillas.tablero_actual]
-                  tablero_juego.mostrar_tablero()
-                  menu_acciones()
+            if not import_dccasillas.tableros:
+                    print("No hay tableros para continuar :/")
+                    continue
             else:
-                  print("No hay un tablero abierto para continuar.")
-                  continue
+                print("Elegir un tablero:")
+                for i in range(len(import_dccasillas.tableros)):
+                    print(f"[{i}] Tablero {i + 1}")
+                numero_tablero = input("Ingrese el número del tablero que desea abrir: ").strip()
+                if not numero_tablero.isdigit():
+                    print("Por favor, ingrese un número válido.")
+                    continue
+                numero_tablero = int(numero_tablero)
+                if 0 <= numero_tablero < len(import_dccasillas.tableros):
+                    import_dccasillas.abrir_tablero(numero_tablero)
+                    tablero_juego = import_dccasillas.tableros[import_dccasillas.tablero_actual]
+                    tablero_juego.mostrar_tablero()
+                    menu_acciones()
+
+                else:
+                    print("Número de tablero inválido. Inténtelo de nuevo.")
+                    continue
+
       elif accion == "3":
             if import_dccasillas.guardar_estado():
                   print("Estado del juego guardado correctamente.")
@@ -105,7 +129,7 @@ def menu_acciones():
             accion = input("Indique su opción (1, 2, 3, 4, 5): ").strip()
 
             if accion == "1":
-                  tablero_juego = import_dccasillas.tableros[0]
+                  tablero_juego = import_dccasillas.tableros[import_dccasillas.tablero_actual]
                   tablero_juego.mostrar_tablero()
 
             elif accion not in ["1", "2", "3", "4", "5"]:
@@ -114,27 +138,36 @@ def menu_acciones():
                   continue
 
             elif accion == "2":
+                  tablero_juego = import_dccasillas.tableros[import_dccasillas.tablero_actual]
                   fila = input("Ingrese la fila de la casilla a modificar: ").strip()
                   columna = input("Ingrese la columna de la casilla a modificar: ").strip()
                   if fila.isdigit() and columna.isdigit():
                         fila = int(fila)
                         columna = int(columna)
-                        if import_tablero.modificar_casilla(fila, columna):
+                        if tablero_juego.modificar_casilla(fila, columna):
                               print("Casilla modificada correctamente !!")
                         else:
                               print("Este movimiento no es valido >:(")
                   else:
                         print("Por favor, ingrese números válidos para fila y columna.")
             elif accion == "3":
-                  if import_tablero.validar():
+                  tablero_juego = import_dccasillas.tableros[import_dccasillas.tablero_actual]
+                  if tablero_juego.validar():
                        print("El tablero está solucionado!! :))")
+                       temporal = import_dccasillas.tableros[import_dccasillas.tablero_actual] #
+                       import_dccasillas.puntaje += temporal.movimientos #interprete movimientos como puntaje y mientras menos puntos mejor
                   else:
                         print("El tablero no está solucionado :(")
                  
             elif accion == "4":
-                  solucion = import_tablero.encontrar_solucion()
-                  if solucion:
+                  temporal = import_dccasillas.tableros[import_dccasillas.tablero_actual]
+                  solucion = temporal.encontrar_solucion()
+                  if solucion is not None:
                         print("Solución encontrada:")
+                        filas = len(solucion.tablero) -1
+                        columnas = len(solucion.tablero[0]) -1
+                        import_dccasillas.puntaje += filas * columnas #puntos por dificultad
+                        temporal.estado = True
                         solucion.mostrar_tablero()
                   else:
                         print("No se encontró una solución, intentalo de nuevo jeje")
@@ -143,4 +176,5 @@ def menu_acciones():
                   print("Volviendo al menú de juego...")
                   condicion_2 = False
                   
+
 menu_juego()

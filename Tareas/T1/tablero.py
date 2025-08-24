@@ -39,8 +39,9 @@ class Tablero:
         for i in range(filas + 1):
             if i +1 >= len(info):
                 break
-            original = info[i +1].strip().split(" ")
-            self.tablero.append(original)
+            else:
+                original = info[i +1].strip().split()[:columnas + 1 ] # DEBUG PQ SE DAÑABA EL TABLERO Y COLOCABA UN "]" que estaba de mas
+                self.tablero.append(original)
 
         #self.diccionario_original = copy.deepcopy(self.diccionario)
 
