@@ -10,7 +10,7 @@
 * En la primera parte, clase Tablero, logre sacar todos los testscases con cada una de las funciones, para la funcion de encontrar solucion definí otra funcion dentro de ella para crear una funcion recursiva (backtracking) hasta que validar() se cumpliera y en caso de que recursivamente se convirtiera el tablero en el inicial esta retorna None y asi se encuentra la solución. 🟢
 
 
-* Para la segunda clase no logré hacer la función de recuperar estado, me dió demasiados problemas desde el principio. Pero de resto logré sacar todos los testcases y durante el código deje links con todo lo que saque de internet para lograr sacar la tarea🟨
+* Para la segunda clase (Dccasillas) no logré hacer la función de recuperar estado, me dió demasiados problemas desde el principio y no entendí los errores. Pero de resto logré sacar todos los testcases y durante el código deje links con todo lo que saque de internet para lograr sacar la tarea🟨
 
 * Para el menú hice todo lo que pedían. Primero se pide el nombre de usuario, luego la configuración que se quiere utlizar (con o sin .txt) y despues de probar llama bien a las funciones de tablero y dccasillas y puedes jugar el juego a traves del menú.-🟢
 
