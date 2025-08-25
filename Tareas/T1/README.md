@@ -23,8 +23,8 @@ El módulo principal de la tarea a ejecutar es  ```main.py```. Tienen que tener 
 La lista de librerías externas que utilicé fue la siguiente:
 
 1. ```os```: ```os.path.join``` y ```os.path.exists```
-2. ```copy```: ```copy.deepcopy``` 
-3.``visualizador.pyc```: ```visualizador.imprimir_tablero```
+2. ```copy```: ```copy.deepcopy```
+3. ``visualizador.pyc```: ```visualizador.imprimir_tablero```
 
 ### Librerías propias
 No creé librerias propias solo una funcion recursiva y los menús.
