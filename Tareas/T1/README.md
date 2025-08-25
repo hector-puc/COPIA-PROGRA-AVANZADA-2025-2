@@ -32,7 +32,7 @@ No creé librerias propias solo una funcion recursiva y los menús.
 ## Referencias de código externo :book:
 
 Para realizar mi tarea saqué código de:
-1. https://docs.python.org/es/3.13/tutorial/errors.html. Esto me explico que era ty y except y como se usaba
+1. https://docs.python.org/es/3.13/tutorial/errors.html. Esto me explico que era try, except y como se usaba
 2. https://www.geeksforgeeks.org/dsa/introduction-to-backtracking-2 esto me explico que era el backtracking para usarlo en la funcion de encontrar solucion
 3. https://www.pythontutorial.net/python-basics/python-create-text-file esto me explico como se creba un archivo desde python para guardar un estado
 4. https://stackoverflow.com/questions/2259382/pythonic-way-to-check-if-a-file-exists este me explico como saber si un archivo existe o no
