@@ -83,14 +83,64 @@ class DCCasillas:
         ruta_archivo = os.path.join(path) #cambie esta linea de (path, nombre) a (path), en casod de error
         
         with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+            linea = archivo.readlines()
+        
+        if not linea:
+            return False
+        
+        
+        if not linea[0].strip().isdigit():
+            return False
+        
+        #cantidad de tableros
+        
+        cantidad_tableros = int(linea[0].strip())
+        self.tableros = []
+        indice_para_moverse = 1
 
-            print(len(self.tableros))
+        for i in range(cantidad_tableros):
+
+            #movimientos
+
+            movimientos = int(linea[indice_para_moverse].strip())
+            indice_para_moverse += 1
+
+#tamaño tablero
+
+            diemensiones = linea[indice_para_moverse].strip().split()
+            filas = int(diemensiones[0])
+            columnas = int(diemensiones[1])
+            indice_para_moverse += 1
+
+            if filas <= 0 or columnas <= 0 or movimientos < 0:
+                return False
             
-            for tablero in self.tableros:
-                print(tablero.movimientos)
-                print(tablero.filas, tablero.columnas)
+            #hacer tablero una lista
 
-                for fila in tablero.tablero:
-                    print(" ".join(fila))
+            tablero_nuevo = []
+            for i in range(filas + 1):
+
+                linea_completa = linea[indice_para_moverse].strip().split()
+                for casilla in linea_completa:
+                    if casilla.startswith("X"):
+                        if not (casilla[1:].isdigit() or int(casilla[1:]) < 0):
+                            return False
+                    elif casilla != ".":
+                        if not (casilla.isdigit() or int(casilla) < 0):
+                            return False
+                
+                tablero_nuevo.append(linea_completa)
+                indice_para_moverse += 1
+            
+            tablero_completo = tablero.Tablero()
+            tablero_completo.filas = filas
+            tablero_completo.columnas = columnas
+            tablero_completo.tablero = tablero_nuevo
+            tablero_completo.movimientos = movimientos
+            tablero_completo.estado = tablero_completo.validar()
+
+            self.tableros.append(tablero_completo)
+
         return True
-    
+
+
