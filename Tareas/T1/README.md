@@ -4,6 +4,8 @@
 
 <Fui capaz de hacer casi todo, con mucha ayuda de internet, de los cuales coloqué los links de lo que utilicé por el codigo, lo implemente como comentarios, no saque codigos directamente pero igual dejé la constancia de los links que visité, en esos links busque como se utilizaban funciones que no sabia como funcionaban>
 
+<El codigo asume que no utilizas caracteres especiales como /, \, ?, *, entre otros
+
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
 ##### Funcionalidades 
