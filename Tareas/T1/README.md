@@ -4,6 +4,8 @@
 
 <Fui capaz de hacer casi todo, con mucha ayuda de internet, de los cuales coloqué los links de lo que utilicé por el codigo, lo implemente como comentarios, no saque codigos directamente pero igual dejé la constancia de los links que visité, en esos links busque como se utilizaban funciones que no sabia como funcionaban>
 
+<El codigo asume que no utilizas caracteres especiales como /, \, ?, *, entre otros
+
 ### Cosas implementadas y no implementadas :white_check_mark: :x:
 
 ##### Funcionalidades 
@@ -12,10 +14,10 @@
 
 * Para la segunda clase (Dccasillas) no logré hacer la función de recuperar estado, me dió demasiados problemas desde el principio y no entendí los errores. Pero de resto logré sacar todos los testcases y durante el código deje links con todo lo que saque de internet para lograr sacar la tarea🟨
 
-* Para el menú hice todo lo que pedían. Primero se pide el nombre de usuario, luego la configuración que se quiere utlizar (con o sin .txt) y despues de probar llama bien a las funciones de tablero y dccasillas y puedes jugar el juego a traves del menú.-🟢
+* Para el menú hice todo lo que pedían. Primero se pide el nombre de usuario, luego la configuración que se quiere utlizar (con o sin .txt) y despues de probar llama bien a las funciones de tablero y dccasillas a excepcion de recuperar estado la cual no funcion pero puedes jugar el juego a traves del menú y ocupar la mayoría de las funciones sin problema.🟢
 
 ## Ejecución :computer:
-El módulo principal de la tarea a ejecutar es  ```main.py```. Tienen que tener los archivos ```tablero.py``` y ```dccasillas.py``` y ```visualizador.pyc``` en una carpeta y ejecutar ```main.py``` para que funcione, no es necesario instalar nada más
+El módulo principal de la tarea a ejecutar es  ```main.py```. Tienen que tener los archivos ```tablero.py``` y ```dccasillas.py``` y ```visualizador.pyc``` en una carpeta y ejecutar ```main.py``` desde la consola para que funcione, no es necesario instalar nada más
 
 
 ## Librerías :books:
