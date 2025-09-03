@@ -1,0 +1,11 @@
+__pycache__
+.ipynb_checkpoints
+.idea
+.DS_Store
+*.pyc
+.vscode
+
+
+/data/
+Enunciado_T2.pdf
+notas.txt
