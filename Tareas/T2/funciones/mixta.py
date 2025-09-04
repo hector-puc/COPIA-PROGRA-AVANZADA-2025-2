@@ -1,0 +1,50 @@
+from .carta import Carta
+from .tropa import Tropa
+from .estructura import Estructura
+
+class Mixta(Tropa):
+
+    def __init__(self, instancia_tropa: Tropa, instancia_estructura: Estructura):
+
+        if not isinstance(instancia_tropa, Tropa):
+            print("instancia_tropa debe ser una Tropa válida")
+            pass
+        if not isinstance(instancia_estructura, Estructura):
+            print("instancia_estructura debe ser una Estructura válida")
+            pass
+
+        vida_maxima_combinada = int(round(instancia_estructura.vida_maxima + (instancia_tropa.vida_maxima / 2)))
+
+        #menor multiplicador recibe menos daño
+        multiplicador_defensa_combinado = min(instancia_tropa.multiplicador_defensa, instancia_estructura.multiplicador_defensa)
+        multiplicador_ataque_combinado = instancia_tropa.multiplicador_ataque
+        ataque_base_combinado = instancia_tropa.ataque_base
+        probabilidad_especial_combinada = ((instancia_tropa.probabilidad_especial + instancia_estructura.probabilidad_especial) / 2.0 * 1.10)
+        nombre_carta = f"{instancia_tropa.nombre_carta}-{instancia_estructura.nombre_carta}"
+        habilidad_especial_combinada = f"{instancia_tropa.usar_habilidad_especial} + {instancia_estructura.usar_habilidad_especial}"
+
+        precio_mixto = 0 #por cambiar
+
+        super().__init__(
+            nombre_carta = nombre_carta,
+            tipo_carta = "mixta",
+            vida_maxima = vida_maxima_combinada,
+            multiplicador_defensa = multiplicador_defensa_combinado,
+            precio_carta = precio_mixto,
+            probabilidad_especial = probabilidad_especial_combinada,
+            ataque_base = ataque_base_combinado,
+            multiplicador_ataque = multiplicador_ataque_combinado,
+            habilidad_especial= habilidad_especial_combinada 
+        )
+
+        
+        
+
+
+    def __str__(self):
+        return (f"{self.nombre_carta} (mixta) - "
+                f"Vida: {self.vida_actual}/{self.vida_maxima}, "
+                f"Ataque: {self.ataque_base}, "
+                f"Mult. Ataque: x{self.multiplicador_ataque}, "
+                f"Mult. Defensa: x{self.multiplicador_defensa}, "
+                f"Prob. Especial: {self.probabilidad_especial:.2f}")
