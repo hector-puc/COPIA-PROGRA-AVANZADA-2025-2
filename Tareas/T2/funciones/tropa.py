@@ -9,6 +9,7 @@ class Tropa(Carta):
         
         self.ataque_base = ataque_base
         self.multiplicador_ataque = multiplicador_ataque
+        self.habilidad_especial = habilidad_especial
 
     def atacar(self, ia_enemiga):
 

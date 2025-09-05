@@ -1,6 +1,7 @@
 from .carta import Carta
 from .tropa import Tropa
 from .estructura import Estructura
+from random import random
 
 class Mixta(Tropa):
 
@@ -12,6 +13,9 @@ class Mixta(Tropa):
         if not isinstance(instancia_estructura, Estructura):
             print("instancia_estructura debe ser una Estructura válida")
             pass
+
+        self.tropa_base = instancia_tropa
+        self.estructura_base = instancia_estructura
 
         vida_maxima_combinada = int(round(instancia_estructura.vida_maxima + (instancia_tropa.vida_maxima // 2)))
 
@@ -35,27 +39,20 @@ class Mixta(Tropa):
             ataque_base = ataque_base_combinado,
             multiplicador_ataque = multiplicador_ataque_combinado,
             habilidad_especial = habilidad_especial_combinada
-        )
+            )
 
-""""
+        
+
     def usar_habilidad_especial(self):
 
-        valor_original_prob_tropa = float(self.instancia_tropa.probabilidad_especial)
-        valor_original_prob_estructura = float(self.instancia_estructura.probabilidad_especial)
+        if random() < self.probabilidad_especial:
+            print(f"{self.nombre_carta} ha utilizado habilidades especiales!")    
 
-        probabilidad_especial_combinada = ((self.instancia_tropa.probabilidad_especial + self.instancia_estructura.probabilidad_especial) / 2.0) * 1.10
+            self.tropa_base.usar_habilidad_especial()
+            self.estructura_base.usar_habilidad_especial()
+        else:
+            print(f"{self.nombre_carta} no activo su habilidad :(")
 
-        self.instancia_tropa.probabilidad_especial = probabilidad_especial_combinada
-        self.instancia_estructura.probabilidad_especial = probabilidad_especial_combinada
-
-        booleano_habilidad_tropa = bool(self.instancia_tropa.usar_habilidad_especial())
-        booleano_habilidad_estructura = bool(self.instancia_estructura.usar_habilidad_especial())
-
-        self.instancia_tropa.probabilidad_especial = valor_original_prob_tropa
-        self.instancia_estructura.probabilidad_especial = valor_original_prob_estructura
-
-        return booleano_habilidad_tropa or booleano_habilidad_estructura
-"""
 
     def __str__(self):
         return (f"{self.nombre_carta} (mixta) - "
@@ -63,4 +60,4 @@ class Mixta(Tropa):
                 f"Ataque: {self.ataque_base}, "
                 f"Multiplicador Ataque: x{self.multiplicador_ataque}, "
                 f"Multiplicador Defensa: x{self.multiplicador_defensa}, "
-                f"Probabilidad Especial: {self.probabilidad_especial_combinada:.2f}")
+                f"Probabilidad Especial: {self.probabilidad_especial}%")

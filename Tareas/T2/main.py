@@ -1,6 +1,6 @@
 import sys
 from funciones.leer_archivos import cargar_cartas, cargar_ias, cargar_multiplicadores
-
+import funciones.ia
 
 def principio():
     if len(sys.argv) < 3:
@@ -13,6 +13,12 @@ def principio():
         dificultad = argumento_1
         nombre = sys.argv[2]
 
+        lista_multiplicadores = cargar_multiplicadores()
+        ias_nombre = cargar_ias(dificultad)
+
+        funciones.ia.inyectar_multiplicadores(ias_nombre, lista_multiplicadores) ########
+        print(ias_por_nombre["CatGPT"].multiplicadores_ataque)
+        print(ias_por_nombre["CatGPT"].multiplicadores_defensa)
         print(f"Iniciando partida en dificultad {dificultad}...")
 
     else:
