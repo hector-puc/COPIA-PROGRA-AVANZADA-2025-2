@@ -1,0 +1,19 @@
+CURE_PEPPA = 0.20          
+DEF_CAB = 0.10             
+PROB_LARRY_GOD = 0.30      
+PROB_LARRY_MID = 0.10      
+PROB_BARB = 0.30           
+POWER_UP_BARB = 0.10       
+PROB_FIRE = 0.25           
+PROB_GLOBO = 0.50          
+DANO_BOMBA = 70            
+
+CANNON_ABILITY = 0.20 
+CANNON_DECREASE = 0.15     
+DIE_PROB = 0.30            
+PROB_LAPIDA = 0.30         
+
+
+ORO_POR_RONDA = 3
+ORO_POR_VICTORIA = 5
+COSTO_COMBINACION = 5      

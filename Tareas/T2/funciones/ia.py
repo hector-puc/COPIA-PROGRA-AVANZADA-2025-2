@@ -1,7 +1,9 @@
-from random import random
+from random import random, choice, sample
 from .carta import Carta
 from .leer_archivos import cargar_multiplicadores
 import os
+from funciones.jugador import Jugador
+from sys import argv
 
 class IA:
     def __init__(self, nombre, vida_maxima, ataque, descripcion, probabilidad_especial, velocidad):
@@ -15,7 +17,10 @@ class IA:
         
         self.multiplicadores_ataque = {}
         self.multiplicadores_defensa = {}
+        self.nombre = argv[2]
 
+        self.instancia_jugador = Jugador(nombre)
+        
 
     def sigue_vivo(self):
         if self.vida > 0:
@@ -55,7 +60,7 @@ class IA:
                 cartas_defensoras.append(i)
                 numero_defensoras += 1
 
-            elif i.tipo_carta == "tropa" and i.vida > 0:
+            elif i.tipo_carta == "tropa" and i.vida_actual > 0:
                 cartas_tropa.append(i)
                 
 
@@ -70,30 +75,96 @@ class IA:
                 print(f"{self.nombre} ataca a {carta.nombre_carta} con {self.ataque} de daño completo")
                 carta.recibir_dano(self.ataque, tipo_atacante="ia")        
     
-    def inyectar_multiplicadores(diccionario_ias, lista_multiplicadores): ########
+    def inyectar_multiplicadores(self): ########
     
-        for registro in lista_multiplicadores:
-            
-            nombre_de_ia = registro["ia_nombre"]                 
-            tipo_de_carta = registro["carta_tipo"].lower()
-            multiplicador_de_ataque = float(registro["multiplicador_ataque"])
-            multiplicador_de_defensa = float(registro["multiplicador_defensa"])
+        lista_diccionarios_multiplicadores = cargar_multiplicadores()
 
-            if nombre_de_ia in diccionario_ias:
-                instancia_ia = diccionario_ias[nombre_de_ia]
-
-                instancia_ia.multiplicadores_ataque[tipo_de_carta] = multiplicador_de_ataque
-                instancia_ia.multiplicadores_defensa[tipo_de_carta] = multiplicador_de_defensa
-            else:
-                pass
+        for fila in lista_diccionarios_multiplicadores:
+            if fila["ia_nombre"] == self.nombre:
+                tipo_carta = fila["carta_tipo"].strip().lower()
+                self.multiplicadores_ataque[tipo_carta] = float(fila["multiplicador_ataque"])
+                self.multiplicadores_defensa[tipo_carta] = float(fila["multiplicador_defensa"])
     
-    def usar_habilidad_especial(self, instancia_jugador):
-        tirada = random()
-        if tirada < self.probabilidad_especial:
-            return True
-        return False
-    
-    def __str__(self) -> str:  # DEGBUG
+    def __str__(self):  # DEGBUG
         return (f"IA {self.nombre} | Vida: {self.vida}/{self.vida_maxima} | "
                 f"Ataque: {self.ataque} | Velocidad: {self.velocidad} | "
                 f"Probabilidad Especial: {self.probabilidad_especial}")
+    
+
+    #para toda esta seccion la cual era toda aleatroria busque referencias de la libreria random 
+    # https://docs.python.org/3/library/random.html
+
+    def usar_habilidad_especial(self, instancia_jugador):
+
+        tirada = random()
+
+        
+        
+        if tirada > self.probabilidad_especial:
+            return False  # no se activo
+
+        if self.nombre == "CatGPT":
+            return self.habilidad_catgpt(instancia_jugador)
+
+        elif self.nombre == "CowPilot":
+            return self.habilidad_cowpilot(instancia_jugador)
+
+        elif self.nombre == "Crok":
+            return self.habilidad_crok(instancia_jugador)
+
+        elif self.nombre == "DeepSheep":
+            return self.habilidad_deepsheep(instancia_jugador)
+
+        elif self.nombre == "Gemibee":
+            return self.habilidad_gemibee()
+
+        return False
+
+    # habilidades
+
+    def habilidad_catgpt(self, jugador):
+        for carta in jugador.mazo:
+            carta.multiplicador_ataque = 0.65
+            carta.multiplicador_defensa = 0.65
+        print("[CatGPT] Redujo multiplicadores de todas las cartas a 0.65")
+        return True
+
+    def habilidad_cowpilot(self, jugador):
+        if len(jugador.mazo) < 2:
+            return False
+        
+        
+        indices = sample(range(len(jugador.mazo)), 2)
+        referencia = choice(jugador.mazo)
+        jugador.mazo[indices[0]] = referencia
+        jugador.mazo[indices[1]] = referencia
+        print("CowPilot Reemplazó dos cartas por copias de otra.")
+        return True
+
+    def habilidad_crok(self, jugador):
+        if len(jugador.mazo) < 2:
+            return False
+        elegidas = sample(jugador.mazo, 2)
+        for carta in elegidas:
+            carta._turnos_inhabilitada = 3
+        print("Crok Dos cartas quedaron inhabilitadas por 3 rondas.")
+        return True
+
+    def habilidad_deepsheep(self, jugador):
+        if not jugador.mazo:
+            return False
+        for i in jugador.mazo:
+            if carta.vida_actual < vida_max:
+                vida_max = carta.vida_max
+        for carta in jugador.mazo:
+            carta._vida_fake = vida_max
+        print("DeepSheep ahora todas las cartas muestran la misma vida :O.")
+        return True
+
+    def habilidad_gemibee(self):
+        for tipo in self.multiplicadores_ataque:
+            self.multiplicadores_ataque[tipo] += 0.1
+        for tipo in self.multiplicadores_defensa:
+            self.multiplicadores_defensa[tipo] += 0.1
+        print("Gemibee aumentó sus multiplicadores de ataque y defensa en +0.1")
+        return True

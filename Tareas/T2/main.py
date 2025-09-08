@@ -16,9 +16,8 @@ def principio():
         lista_multiplicadores = cargar_multiplicadores()
         ias_nombre = cargar_ias(dificultad)
 
-        funciones.ia.inyectar_multiplicadores(ias_nombre, lista_multiplicadores) ########
-        print(ias_por_nombre["CatGPT"].multiplicadores_ataque)
-        print(ias_por_nombre["CatGPT"].multiplicadores_defensa)
+        funciones.ia.cargar_multiplicadores() ######## 
+        
         print(f"Iniciando partida en dificultad {dificultad}...")
 
     else:

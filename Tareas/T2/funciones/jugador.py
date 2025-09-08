@@ -29,18 +29,18 @@ class Jugador:
         return False
     
     def obtener_estructuras_y_mixtas_vivas(self):
-        estructuras_vivas = 0
+        estructuras_vivas = []
         for i in self.mazo:
             if i.vida_actual > 0 and i.tipo_carta in ("estructura", "mixta"):
-                estructuras_vivas += 1
+                estructuras_vivas.append(i)
         return estructuras_vivas
 
 
     def cartas_vivas(self):
-        vivas = 0
+        vivas = []
         for i in self.mazo:
             if i.vida_actual > 0:
-                vivas += 1
+                vivas.append(i)
         return vivas
     
     def remover_carta_muerta_del_mazo(self, objeto_carta: Carta):
@@ -119,7 +119,7 @@ class Jugador:
         lineas_de_texto.append("Cartas en mazo:")
 
         if not self.mazo:
-            lineas_de_texto.append("  (Mazo vacío)")
+            lineas_de_texto.append("Mazo vacío")
         else:
             for indice, carta in enumerate(self.mazo, start=1):
                 lineas_de_texto.append(f"  [{indice}] {carta}")
