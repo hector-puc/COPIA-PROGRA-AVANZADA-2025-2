@@ -21,7 +21,20 @@ class IA:
 
         self.instancia_jugador = Jugador(nombre)
         
+    @property
+    def vida(self):
+        return self.vida
+    
+    @vida.setter
+    def vida(self, valor ):
+        if int(valor) < 0:
+            self.vida = 0
+        elif int(valor) > self.vida_maxima:
+            self.vida = self.vida_maxima
+        else:
+            self.vida = int(valor)
 
+    
     def sigue_vivo(self):
         if self.vida > 0:
             return True

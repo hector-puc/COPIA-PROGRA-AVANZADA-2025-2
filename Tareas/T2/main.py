@@ -25,6 +25,6 @@ def principio():
 
         print("Iniciando archivo de guardado...")
 
-if __name__ == "__main__":
+if __name__ == "__main__": # para saber si se ejecuta desde la terminal el archivo main.py
     principio()
 

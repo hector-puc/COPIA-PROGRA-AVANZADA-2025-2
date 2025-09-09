@@ -59,7 +59,7 @@ class Estructura(Carta):
                 nueva = contexto.instancia_jugador.obtener_tropa_aleatoria_de_coleccion()
                 if nueva:
                     contexto.instancia_jugador.agregar_al_mazo(nueva)
-                    contexto.registro_eventos.append(f"[Recolector] Entra {nueva.nombre_carta} por victoria/supervivencia.")
+                    contexto.registro_eventos.append(f"Recolector trae a {nueva.nombre_carta} por victoria/supervivencia.")
             self._pendiente_reemplazo = False
 
     #HORNO
@@ -68,7 +68,7 @@ class Estructura(Carta):
         nueva = crear_espiritu_igneo()
         if contexto.orden_ataca_primero == "ia":
             contexto.instancia_jugador.agregar_al_mazo(nueva)
-            contexto.registro_eventos.append("[Horno] Entra un Espíritu Ígneo de inmediato.")
+            contexto.registro_eventos.append("El Horno hace que entre un Espíritu Ígneo de inmediato.")
         else:
             self._pendiente_reemplazo = nueva
 
@@ -76,7 +76,7 @@ class Estructura(Carta):
         if getattr(self, "_pendiente_reemplazo", None):
             if contexto.instancia_jugador.hay_alguna_carta_viva():
                 contexto.instancia_jugador.agregar_al_mazo(self._pendiente_reemplazo)
-                contexto.registro_eventos.append("[Horno] Entra un Espíritu Ígneo por victoria/supervivencia.")
+                contexto.registro_eventos.append("Gracias al horno entra un Espíritu Ígneo por victoria/supervivencia.")
             self._pendiente_reemplazo = None
 
 
@@ -84,7 +84,7 @@ class Estructura(Carta):
 
     def antes_de_recibir_dano(self, contexto) -> bool:
         if contexto.generador_aleatorio() < PROB_LAPIDA:
-            contexto.registro_eventos.append("[Lápida] Evitó el daño.")
+            contexto.registro_eventos.append("Lápida evitó el daño.")
             return True
         return False
 
@@ -92,5 +92,5 @@ class Estructura(Carta):
 
     def morir(self, contexto):
         contexto.instancia_ia.recibir_dano(DANO_BOMBA, "estructura")
-        contexto.registro_eventos.append(f"[Torre Bomba] ¡Explota! {DANO_BOMBA} a la IA.")
+        contexto.registro_eventos.append(f"La Torre Bomba explotó {DANO_BOMBA} a la IA.")
 
