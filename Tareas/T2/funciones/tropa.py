@@ -1,7 +1,8 @@
-from abc import ABC
-from .carta import Carta
-from parametros import CURE_PEPPA, DEF_CAB, PROB_LARRY_GOD, PROB_LARRY_MID, PROB_BARB, POWER_UP_BARB, PROB_FIRE, PROB_GLOBO,DANO_BOMBA, CANNON_ABILITY,CANNON_DECREASE
-
+from funciones.carta import Carta
+from parametros import CURE_PEPPA, DEF_CAB, PROB_LARRY_GOD, PROB_LARRY_MID, PROB_BARB, POWER_UP_BARB, PROB_FIRE, PROB_GLOBO, DANO_BOMBA, CANNON_ABILITY, CANNON_DECREASE, DIE_PROB, PROB_LAPIDA
+from funciones.jugador import Jugador
+from funciones.ia import IA
+from funciones.leer_archivos import cargar_cartas, cargar_ias, cargar_multiplicadores
 
 class Tropa(Carta):
     

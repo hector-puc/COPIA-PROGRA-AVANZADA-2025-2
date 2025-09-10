@@ -51,17 +51,17 @@ class Carta(ABC):
     def puede_atacar(self) -> bool:
         return False
 
-    def on_inicio_de_ronda(self, contexto): 
+    def inicio_de_ronda(self, contexto): 
         pass
-    def on_antes_de_ataque_del_jugador(self, contexto): 
+    def antes_de_ataque_del_jugador(self, contexto): 
         pass
-    def on_atacar(self, contexto): 
+    def atacar(self, contexto): 
         pass
-    def on_antes_de_recibir_dano(self, contexto) -> bool:
+    def antes_de_recibir_dano(self, contexto) -> bool:
         return False
-    def on_morir(self, contexto): 
+    def morir(self, contexto): 
         pass
-    def on_fin_de_ronda(self, contexto): 
+    def fin_de_ronda(self, contexto): 
         pass
     
 

@@ -6,7 +6,7 @@ class Jugador:
         self.nombre_jugador = nombre_jugador
         self.oro_disponible = 15 
 
-        #no se cuanto es el oro inicial
+        #15 de oro inicial
         
         self.coleccion = []
         self.mazo = []    
@@ -88,7 +88,7 @@ class Jugador:
         #como el enunciado si el reparto es equitativo entre las tropas o solo a una lo hice para que sea reparto equitativo
         
         lista_tropas_vivas = []
-        for i in self.obtener_cartas_vivas_en_mazo():
+        for i in self.cartas_vivas():
             if i.tipo_carta == "tropa":
                 lista_tropas_vivas.append(i)
             

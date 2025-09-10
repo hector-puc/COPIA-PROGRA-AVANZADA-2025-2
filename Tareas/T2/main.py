@@ -1,6 +1,6 @@
+
 import sys
 from funciones.leer_archivos import cargar_cartas, cargar_ias, cargar_multiplicadores
-import funciones.ia
 
 def principio():
     if len(sys.argv) < 3:

@@ -1,8 +1,8 @@
-from .carta import Carta
+from funciones.carta import Carta
 from parametros import DANO_BOMBA, CANNON_ABILITY, CANNON_DECREASE, DIE_PROB, PROB_LAPIDA
-from jugador import Jugador
-from sys import argv
-from ia import IA
+from funciones.jugador import Jugador
+from funciones.ia import IA
+from funciones.leer_archivos import cargar_cartas, cargar_ias, cargar_multiplicadores
 
 class Estructura(Carta):
 
@@ -10,9 +10,10 @@ class Estructura(Carta):
         
         super().__init__(nombre_carta, tipo_carta, vida_maxima, multiplicador_defensa, precio_carta, probabilidad_especial)
         
-        self.nombre = argv[2]
-        self.instancia_jugador = Jugador(self.nombre)
-        self.instancia_ia = IA()
+        self.ataque_base = ataque_base
+        self.multiplicador_ataque = multiplicador_ataque
+        self.habilidad_especial = habilidad_especial
+        
     def usar_habilidad_especial(self):
 
         print(f"{self.nombre_carta} intenta usar su habilidad especial.")
