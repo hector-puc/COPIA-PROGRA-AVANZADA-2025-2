@@ -1,4 +1,5 @@
 from random import random
+import copy
 
 class Contexto:
     def __init__(self, instancia_jugador, instancia_ia, lista_cartas_aliadas, orden_ataca_primero, generador_aleatorio, registro_eventos=None):
@@ -10,37 +11,50 @@ class Contexto:
         self.generador_aleatorio = generador_aleatorio 
         self.registro_eventos = registro_eventos
 
-def velocidad(instancia_ia, cartas_activas):
-    velocidad_ia = getattr(instancia_ia, "velocidad", 0.0)
+
+#https://stackoverflow.com/questions/4075190/what-is-how-to-use-getattr-in-python
+#para saber si el atributo existe en la clase y no de errores xd que lo cargaba mal 
+
+def velocidad(instancia_ia, cartas_activas_del_jugador):
+    #montapatos
+    for i in cartas_activas_del_jugador:
+        if getattr(i, "nombre_carta", "").strip().lower() == "montapatos" and getattr(i, "vida_actual", 0) > 0:
+            return "jugador"
+
+    velocidad_ia = float(getattr(instancia_ia, "velocidad", 0.0))
     velocidad_jugador = random()
     if velocidad_jugador >= velocidad_ia:
-        orden = "jugador"
-    elif velocidad_jugador < velocidad_ia:
-        orden = "ia"
-    return orden
+        return "jugador"
+    else:
+        return "ia"
     
 
-def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, lista_cartas_activas_del_jugador):
+def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, cartas_activas):
 
-    orden_inicial = velocidad(instancia_jugador, instancia_ia, lista_cartas_activas_del_jugador)
-    objeto_contexto_ronda = Contexto(
-        instancia_jugador=instancia_jugador,
-        instancia_ia=instancia_ia,
-        lista_cartas_aliadas=lista_cartas_activas_del_jugador,
-        orden_ataca_primero=orden_inicial,  
-        generador_aleatorio=random,
-        registro_eventos=[]
-    )
+    objeto_backup_ia = {"multiplicadores_defensa": instancia_ia.multiplicadores_defensa.copy(), "multiplicadores_ataque": instancia_ia.multiplicadores_ataque.copy(), "ataque": instancia_ia.ataque, "velocidad": getattr(instancia_ia, "velocidad", 0.0),} 
+
+    objeto_backup_jugador = {
+        id(c): (
+            c.multiplicador_defensa,
+            getattr(c, "multiplicador_ataque", None),
+            getattr(c, "ataque", None),
+        )
+        for c in cartas_activas
+    }
+
+    orden_inicial = velocidad(instancia_ia, cartas_activas)
+
+    objeto_contexto_ronda = Contexto(instancia_jugador = instancia_jugador, instancia_ia = instancia_ia, lista_cartas_aliadas = cartas_activas, orden_ataca_primero = orden_inicial,   generador_aleatorio = random, registro_eventos = [] )
 
     #https://micro.recursospython.com/recursos/la-funcion-hasattr.html
     #use hasttr para ver en caso de que la carta tenga ese modulo lo ocupe 
 
-    for carta_en_juego in lista_cartas_activas_del_jugador:
+    for carta_en_juego in cartas_activas:
         if hasattr(carta_en_juego, "inicio_de_ronda"):
             carta_en_juego.inicio_de_ronda(objeto_contexto_ronda)
 
     
-    for carta_en_juego in lista_cartas_activas_del_jugador:
+    for carta_en_juego in cartas_activas:
         if hasattr(carta_en_juego, "antes_de_ataque_del_jugador"):
             carta_en_juego.antes_de_ataque_del_jugador(objeto_contexto_ronda)
 
@@ -49,25 +63,34 @@ def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, lista_cartas_activ
     #JUGADOR USA TODAS LAS CARTAS CON ATACAR
 
     if objeto_contexto_ronda.orden_ataca_primero == "jugador":
-        
-        for carta_en_juego in list(lista_cartas_activas_del_jugador):
+
+
+        for carta_en_juego in list(cartas_activas):
             if hasattr(carta_en_juego, "atacar"):
                 carta_en_juego.atacar(objeto_contexto_ronda)
 
         # ia ataca si no fue bloqueada
         if not getattr(instancia_ia, "_inhabilitada_esta_ronda", False):
-            instancia_ia.atacar(lista_cartas_activas_del_jugador)
+            instancia_ia.usar_habilidad_especial(instancia_jugador)
+            multiplicadr_tropa = float(instancia_ia.multiplicadores_ataque.get("tropa"))
+            multiplicador_estructura  = float(instancia_ia.multiplicadores_ataque.get("estructura"))
+            multiplicador_mixta = float(instancia_ia.multiplicadores_ataque.get("mixta"))
+            instancia_jugador.recibir_dano_de_ia(int(instancia_ia.ataque), multiplicadr_tropa, multiplicador_estructura, multiplicador_mixta, objeto_contexto_ronda)
 
-    else:  # IA primero
+    else:  #ia
         if not getattr(instancia_ia, "_inhabilitada_esta_ronda", False):
-            instancia_ia.atacar(lista_cartas_activas_del_jugador)
+            instancia_ia.usar_habilidad_especial(instancia_jugador)
+            multiplicadr_tropa = float(instancia_ia.multiplicadores_ataque.get("tropa"))
+            multiplicador_estructura  = float(instancia_ia.multiplicadores_ataque.get("estructura"))
+            multiplicador_mixta = float(instancia_ia.multiplicadores_ataque.get("mixta"))
+            instancia_jugador.recibir_dano_de_ia(int(instancia_ia.ataque), multiplicadr_tropa, multiplicador_estructura, multiplicador_mixta, objeto_contexto_ronda)
 
-        for carta_en_juego in list(lista_cartas_activas_del_jugador):
+        for carta_en_juego in list(cartas_activas):
             if hasattr(carta_en_juego, "atacar"):
                 carta_en_juego.atacar(objeto_contexto_ronda)
 
     
-    for carta_en_juego in list(lista_cartas_activas_del_jugador):
+    for carta_en_juego in list(cartas_activas):
         if hasattr(carta_en_juego, "fin_de_ronda"):
             carta_en_juego.fin_de_ronda(objeto_contexto_ronda)
 

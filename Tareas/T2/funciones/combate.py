@@ -1,216 +1,128 @@
-from jugador import Jugador
 from random import random
-
-jugador = Jugador()
+from funciones.contexto import Contexto
 
 def cartas_vivas(mazo):
     vivas = []
-    for i in mazo:
-        if getattr(i, "vida_actual") > 0:
-            vivas.append(i)
-        
+    i = 0
+    while i < len(mazo):
+        carta = mazo[i]
+        if carta.vida_actual > 0:
+            vivas.append(carta)
+        i += 1
     return vivas
 
 def estructuras_y_mixtas_vivas(mazo):
     defensivas = []
-    for i in mazo:
-        tipo = getattr (i, "tipo_carta").lower().strip()
-        if tipo in ("estructura", "mixta") and getattr(i, "vida_actual") > 0:
-            defensivas.append(i)
+    i = 0
+    while i < len(mazo):
+        carta = mazo[i]
+        if (carta.tipo_carta == "estructura" or carta.tipo_carta == "mixta") and carta.vida_actual > 0:
+            defensivas.append(carta)
+        i += 1
     return defensivas
 
 def tropas_vivas(mazo):
     tropas = []
-    for i in mazo:
-        tipo = getattr (i, "tipo_carta").lower().strip()
-        if tipo == "tropa" and getattr(i, "vida_actual") > 0:
-            tropas.append(i)
+    i = 0
+    while i < len(mazo):
+        carta = mazo[i]
+        if carta.tipo_carta == "tropa" and carta.vida_actual > 0:
+            tropas.append(carta)
+        i += 1
     return tropas
 
-def decidir_quien_ataca_primero(ia, montapatos_ver):
-    
-    if montapatos_ver:
-        return "jugador"
-    velocidad_ia = getattr(ia, "velocidad")
 
+def decidir_quien_ataca_primero(instancia_ia):
     velocidad_jugador = random()
-    if velocidad_jugador >= velocidad_ia:
-        return "jugador"
-    else:
+    if instancia_ia.velocidad >= velocidad_jugador:
         return "ia"
-    
-def montapatos_ver(mazo):
-    for i in mazo:
-        nombre = getattr(i, "nombre_carta").lower().strip()
-        if nombre == "montapatos" and getattr(i, "vida_actual") > 0: #si el montapatos esta vivo le da el turno al jugador
-            return True
-    return False
+    else:
+        return "jugador"
 
-def habilidad(carta, nombre_habilidad, contexto): #REVISAR ESTA FUNCION
-    if hasattr(carta, nombre_habilidad): #si tiene la habilidad la activa pero tiene que tener contexto
-        metodo = getattr(carta, nombre_habilidad)
-        metodo(contexto)
-        return True
-    return False
-
-def crear_contexto(instancia_jugador, instancia_ia, mazo_activas, orden_ataca_primero):
-    contexto = {"instancia_jugador": instancia_jugador, "instancia_ia": instancia_ia, "mazo_activas": mazo_activas, "orden_ataca_primero": orden_ataca_primero, "registro_eventos": [], "lista_cartas_aliadas": mazo_activas, "generador_aleatorio": random}
-    return contexto
+def crear_contexto(instancia_jugador, instancia_ia, orden_ataca_primero):
+    return Contexto(instancia_jugador = instancia_jugador, instancia_ia = instancia_ia, lista_cartas_aliadas = instancia_jugador.mazo, orden_ataca_primero = orden_ataca_primero, generador_aleatorio = random, registro_eventos = [])
 
 def anotar(contexto, mensaje):
-    lista = contexto["registro_eventos"]
-    lista.append(mensaje)
+    contexto.registro_eventos.append(str(mensaje))
 
-def dano_ia_jugador(instancia_jugador, instancia_ia, dano_total):
-    mazo = instancia_jugador.mazo
-    objetivo_defensa = estructuras_y_mixtas_vivas(mazo)
 
-    dano = 0
+def inicio_de_ronda(contexto):
+    #aca se revisa si hay montaptos
+    vivas = cartas_vivas(contexto.instancia_jugador.mazo)
+    i = 0
+    while i < len(vivas):
+        vivas[i].antes_de_ataque_del_jugador(contexto)
+        i += 1
 
-    if len(objetivo_defensa) > 0:
-        dano_unitario = dano_total / len(objetivo_defensa)
-        indice = 0
+    #se agregan los buffs
+    vivas = cartas_vivas(contexto.instancia_jugador.mazo)
+    i = 0
+    while i < len(vivas):
+        vivas[i].inicio_de_ronda(contexto)
+        i += 1
 
-        while indice < len(objetivo_defensa):
-            carta = objetivo_defensa[indice] #esto es para las cartas que peuden evitar daño
-
-            evitar = False
-            if hasattr(carta, "antes_de_recibir_dano"):
-                evitar = bool(carta.antes_de_recibir_dano({"instancia_jugador": instancia_jugador, "instancia_ia": instancia_ia}))
-            if not evitar:
-                dano_ronda = int(round(dano_unitario))
-                carta.recibir_dano(dano_ronda)
-                dano += dano_ronda
-
-            if getattr(carta, "vida_actual", 0) <= 0:
-                if hasattr(carta, "morir"):
-                    carta.morir({"instancia_jugador": instancia_jugador, "instancia_ia": instancia_ia})
-            indice += 1
-
-        return dano
-
-#si no hay estructuras o mixtas
-    blanco_tropas = tropas_vivas(mazo)
-    if len(blanco_tropas) == 0:
-        return 0
-    
-    dano_por_tropa = dano_total / len(blanco_tropas)
-
-    indice_2 = 0
-    while indice_2 < len(blanco_tropas):
-        tropa = blanco_tropas[indice_2]
-        evitar = False
-        if hasattr(tropa, "antes_de_recibir_dano"):
-            evitar = bool(tropa.antes_de_recibir_dano({"instancia_jugador": instancia_jugador, "instancia_ia": instancia_ia}))
-
-        if not evitar:
-            dano_en_tropa = int(round(dano_por_tropa))
-            tropa.recibir_dano(dano_en_tropa)
-            dano += dano_en_tropa
-
-        
-        if hasattr(tropa, "morir"):
-            tropa.morir({"instancia_jugador": instancia_jugador, "instancia_ia": instancia_ia})
-        indice_2 += 1
-
-    return dano     
+def fin_de_ronda(contexto):
+    #se revierten los buffs
+    vivas = cartas_vivas(contexto.instancia_jugador.mazo)
+    i = 0
+    while i < len(vivas):
+        vivas[i].fin_de_ronda(contexto)
+        i += 1
 
 def ataque_jugador(contexto):
-    jugador = contexto["instancia_jugador"]
-    ia = contexto["instancia_ia"]
-    mazo = cartas_vivas(jugador.mazo)
+    jugador = contexto.instancia_jugador
+    ia = contexto.instancia_ia
 
-    indice = 0
+    vivas = cartas_vivas(jugador.mazo)
+    i = 0
+    while i < len(vivas) and ia.sigue_vivo():
+        carta = vivas[i]
+        carta.atacar(contexto)
+        i += 1
 
-    while indice < len(mazo):   
-        habilidad(mazo[indice], "inicio_de_ronda", contexto)
-        indice += 1
+def ataque_ia(contexto):
+    jugador = contexto.instancia_jugador
+    ia = contexto.instancia_ia
 
-    indice_2 = 0
-    while indice_2 < len(mazo):
-        habilidad(mazo[indice_2], "antes_de_ataque_del_jugador", contexto)
-        indice_2 += 1
-    
-    
-    indice_3 = 0
-    while indice_3 < len(mazo):
-        carta = mazo[indice_3]
-        tipo = str(getattr(carta, "tipo_carta", "")).lower()
-        if tipo in ("tropa", "mixta") and getattr(carta, "vida_actual") > 0:
-            hizo_habilidad = habilidad(carta, "atacar", contexto)
-            if not hizo_habilidad:
-                ataque_base = int(getattr(carta, "ataque_base", 0))
-                multi_ataque = float(getattr(carta, "multiplicador_ataque"))
-                dano = int(round(ataque_base * multi_ataque))
-                if dano > 0:
-                    ia.recibir_dano(dano, "tropa")
-        indice_3 += 1
+    #aqui se revisa si la ia tiene habilidad especial
+    ia.usar_habilidad_especial(jugador)
+    if not ia.sigue_vivo():
+        return
 
-    
-    def ataque_ia(contexto):
-        jugador = contexto["instancia_jugador"]
-        ia = contexto["instancia_ia"]
+    dano_total_ia = int(ia.ataque)
+    if dano_total_ia <= 0:
+        return
 
-        if hasattr(ia, "usar_habilidad_especial"):
-            ia.usar_habilidad_especial(jugador)
+    multiplicadr_tropa = float(ia.multiplicadores_ataque["tropa"])
+    multiplicador_estructura = float(ia.multiplicadores_ataque["estructura"])
+    multiplicador_tropa = float(ia.multiplicadores_ataque["mixta"])
 
-        if not ia.sigue_vivo():
-            return
-
-        dano_total_ia = int(getattr(ia, "ataque"))
-        if dano_total_ia <= 0:
-            return
-        
-        multiplicador_tropa = float(ia.multiplicadores_ataque["tropa"])
-        multiplicador_estructura  = float(ia.multiplicadores_ataque["estructura"])
-        multiplicador_mixta = float(ia.multiplicadores_ataque["mixta"])
-
-        jugador.recibir_dano_de_ia(jugador, multiplicador_tropa, multiplicador_estructura, multiplicador_mixta) #REVISAR LINEA
-
-    def fin_de_ronda(contexto):
-        jugador = contexto["instancia_jugador"]
-        ia = contexto["instancia_ia"]
-        mazo = cartas_vivas(jugador.mazo)
-
-        indice = 0
-        while indice < len(mazo):
-            habilidad(mazo[indice], "fin_de_ronda", contexto)
-            indice += 1
+    jugador.recibir_dano_de_ia(dano_total_ia, multiplicadr_tropa, multiplicador_estructura, multiplicador_tropa, contexto)
 
 
-    def ejecutar_ronda(instancia_jugador, instancia_ia):
-        
-        jugador_tiene_montapatos = montapatos_ver(instancia_jugador.mazo)
+def ejecutar_ronda(instancia_jugador, instancia_ia):
+    orden_inicial = decidir_quien_ataca_primero(instancia_ia)
 
-        orden = decidir_quien_ataca_primero(instancia_ia, jugador_tiene_montapatos)
-        contexto = crear_contexto(instancia_jugador, instancia_ia, instancia_jugador.mazo, orden)
+    contexto = crear_contexto(instancia_jugador, instancia_ia, orden_inicial)
 
-        anotar(contexto, f"Ataca primero: {orden}")
+    inicio_de_ronda(contexto)
+    anotar(contexto, f"Ataca primero: {contexto.orden_ataca_primero}")
 
-        if orden == "jugador":
-            ataque_jugador(contexto)
-            if instancia_ia.sigue_vivo():
-                ataque_ia(contexto)
-        else:
+    if contexto.orden_ataca_primero == "jugador":
+        ataque_jugador(contexto)
+        if instancia_ia.sigue_vivo():
             ataque_ia(contexto)
-            if instancia_ia.sigue_vivo():
-                ataque_jugador(contexto)
+    else:
+        ataque_ia(contexto)
+        if instancia_ia.sigue_vivo():
+            ataque_jugador(contexto)
+    fin_de_ronda(contexto)
 
-        fin_de_ronda(contexto)
+    gano = instancia_ia.vida <= 0
+    perdio = len(cartas_vivas(instancia_jugador.mazo)) == 0
 
-        gano = False
-        perdio = False
-        if instancia_ia.vida <= 0:
-            gano = True
-        #el jugador pierde si todas sus cartas mueren
-        hay_vivas = False
-        indice = 0
-        while indice < len(instancia_jugador.mazo):
-            if getattr(instancia_jugador.mazo[indice], "vida_actual") > 0:
-                hay_vivas = True
-                break
-            indice += 1
-        if not hay_vivas:
-            perdio = True
-
-        return {"orden": orden, "registro_eventos": contexto["registro_eventos"], "gano": gano, "perdio": perdio}
+    return {
+        "orden": contexto.orden_ataca_primero,
+        "registro_eventos": contexto.registro_eventos,
+        "gano": gano,
+        "perdio": perdio}

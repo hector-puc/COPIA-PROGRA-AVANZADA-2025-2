@@ -36,7 +36,13 @@ def construir_carta_desde_fila(fila_de_cartas):
 def cargar_cargas_archivo():
     return cargar_cartas()
 
-#decidi que no se puedan repetir cartas que ya se tengan y que sea aleatorio el tamaño del mazo
+def mover_del_mazo_a_coleccion(instancia_jugador, objeto_carta):
+    if objeto_carta in instancia_jugador.mazo:
+        instancia_jugador.mazo.remove(objeto_carta)
+        if objeto_carta not in instancia_jugador.coleccion:
+            instancia_jugador.coleccion.append(objeto_carta)
+
+#decidi que no se puedan repetir cartas que ya se tengan y que sea aleatorio el tamaño del catalogo
 def catalogo_sin_repetir_nombres(cartas, cartas_jugador):
     filas_posibles = []
     indice_busqueda = 0

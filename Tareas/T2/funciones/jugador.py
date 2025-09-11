@@ -4,7 +4,7 @@ class Jugador:
     def __init__(self, nombre_jugador: str):
         
         self.nombre_jugador = nombre_jugador
-        self.oro_disponible = 15 
+        self.oro_disponible = 15
 
         #15 de oro inicial
         
@@ -61,15 +61,20 @@ class Jugador:
 
 #defensa jugador
 
-    def recibir_dano_de_ia(self, dano_total: int, multiplicador_ataque_tropa: float, multiplicador_ataque_estructura: float, multiplicador_mixta: float):
+    def recibir_dano_de_ia(self, dano_total: int, multiplicador_ataque_tropa: float, multiplicador_ataque_estructura: float, multiplicador_mixta: float, contexto):
 
         dano_total_efectivo = 0
         blanco_prioritario = self.obtener_estructuras_y_mixtas_vivas() 
 
+        if hasattr(carta_objetivo, "antes_de_recibir_dano"):
+            if carta_objetivo.antes_de_recibir_dano(contexto):
+                return
+
         if len(blanco_prioritario) > 0:
             danio_base_por_carta = dano_total / len(blanco_prioritario)
 
-            for carta_objetivo in (blanco_prioritario):  # () por si la removemos del mazo
+        
+            for carta_objetivo in (blanco_prioritario):
                 if carta_objetivo.tipo_carta == "estructura":
                     dano_contra_esta_carta = danio_base_por_carta * multiplicador_ataque_estructura
                 elif carta_objetivo.tipo_carta == "mixta":
@@ -81,6 +86,7 @@ class Jugador:
 
                 # si murio se va del mazo
                 if carta_objetivo.vida_actual <= 0:
+                    carta_objetivo.morir(contexto)
                     self.remover_carta_muerta_del_mazo(carta_objetivo)
 
             return dano_total_efectivo
@@ -107,21 +113,22 @@ class Jugador:
 
         return dano_total_efectivo
 
+    def agregar_al_mazo(self, objeto_carta):
+        if objeto_carta in self.coleccion and objeto_carta not in self.mazo and len(self.mazo) < 5:
+            self.coleccion.remove(objeto_carta)
+            self.mazo.append(objeto_carta)
+            return True
+        return False
 
+    def hay_alguna_carta_viva(self):
+        for i in self.mazo:
+            if getattr(i, "vida_actual", 0) > 0: #ANTI BUGS
+                return True
+        return False
 
-#REVISAR
+    def obtener_tropa_aleatoria_de_coleccion(self): #retorna la primera tropa q encuentre
+        for i in self.coleccion:
+            if getattr(i, "tipo_carta", "").lower() == "tropa":
+                return i
+        return None
 
-    def __str__(self):
-        lineas_de_texto = []
-        lineas_de_texto.append(f"Jugador: {self.nombre_jugador}")
-        lineas_de_texto.append(f"Rondas ganadas: {self.rondas_ganadas}/{self.rondas_totales}")
-        lineas_de_texto.append(f"Dinero: {self.cantidad_de_oro_disponible}G")
-        lineas_de_texto.append("Cartas en mazo:")
-
-        if not self.mazo:
-            lineas_de_texto.append("Mazo vacío")
-        else:
-            for indice, carta in enumerate(self.mazo, start=1):
-                lineas_de_texto.append(f"  [{indice}] {carta}")
-
-        return "\n".join(lineas_de_texto)

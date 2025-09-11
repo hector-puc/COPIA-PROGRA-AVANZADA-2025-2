@@ -3,13 +3,13 @@ from .carta import Carta
 from .leer_archivos import cargar_multiplicadores
 import os
 from funciones.jugador import Jugador
-from sys import argv
+
 
 class IA:
     def __init__(self, nombre, vida_maxima, ataque, descripcion, probabilidad_especial, velocidad):
         self.nombre = nombre
         self.vida_maxima = int(vida_maxima)
-        self.vida = int(vida_maxima)
+        self.vida_ia = int(vida_maxima)
         self.ataque = int(ataque)
         self.descripcion = descripcion
         self.probabilidad_especial = float(probabilidad_especial)
@@ -17,22 +17,23 @@ class IA:
         
         self.multiplicadores_ataque = {}
         self.multiplicadores_defensa = {}
-        self.nombre = argv[2]
+        
 
         self.instancia_jugador = Jugador(nombre)
         
     @property
     def vida(self):
-        return self.vida
+        return self.vida_ia
     
     @vida.setter
     def vida(self, valor ):
+        valor = int(valor)
         if int(valor) < 0:
-            self.vida = 0
-        elif int(valor) > self.vida_maxima:
-            self.vida = self.vida_maxima
+            self.vida_ia = 0
+        elif valor > self.vida_maxima:
+            self.vida_ia = self.vida_maxima
         else:
-            self.vida = int(valor)
+            self.vida_ia = valor
 
     
     def sigue_vivo(self):
@@ -81,12 +82,12 @@ class IA:
             daño_por_objetivo = round(self.ataque / numero_defensoras)
             for carta in cartas_defensoras:
                 print(f"{self.nombre} ataca a {carta.nombre_carta} con {daño_por_objetivo} de daño dividido")
-                carta.recibir_dano(daño_por_objetivo, tipo_atacante="ia")
+                carta.recibir_dano(daño_por_objetivo)
 
         else:
             for carta in cartas_tropa:
                 print(f"{self.nombre} ataca a {carta.nombre_carta} con {self.ataque} de daño completo")
-                carta.recibir_dano(self.ataque, tipo_atacante="ia")        
+                carta.recibir_dano(self.ataque)        
     
     def inyectar_multiplicadores(self): ########
     
@@ -163,16 +164,18 @@ class IA:
         print("Crok Dos cartas quedaron inhabilitadas por 3 rondas.")
         return True
 
-    def habilidad_deepsheep(self, jugador):
+    def habilidad_deepsheep(self, jugador):    
         if not jugador.mazo:
             return False
+        vida_max = 0
         for i in jugador.mazo:
-            if carta.vida_actual < vida_max:
-                vida_max = carta.vida_max
-        for carta in jugador.mazo:
-            carta._vida_fake = vida_max
+            if i.vida_actual > vida_max:
+                vida_max = i.vida_actual
+        for j in jugador.mazo:
+            j._vida_fake = vida_max
         print("DeepSheep ahora todas las cartas muestran la misma vida :O.")
         return True
+
 
     def habilidad_gemibee(self):
         for tipo in self.multiplicadores_ataque:

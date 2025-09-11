@@ -23,17 +23,17 @@ class Carta(ABC):
     
     @property
     def vida(self):
-        return self.vida
-    
-    @vida.setter
-    def vida(self, valor ):
-        if int(valor) < 0:
-            self.vida = 0
-        elif int(valor) > self.vida_maxima:
-            self.vida = self.vida_maxima
-        else:
-            self.vida = int(valor)
+        return self.vida_actual
 
+    @vida.setter
+    def vida(self, valor):
+        valor = int(valor)
+        if valor < 0:
+            self.vida_actual = 0
+        elif valor > self.vida_maxima:
+            self.vida_actual = self.vida_maxima
+        else:
+            self.vida_actual = valor
 
     @abstractmethod
     def usar_habilidad_especial(self):

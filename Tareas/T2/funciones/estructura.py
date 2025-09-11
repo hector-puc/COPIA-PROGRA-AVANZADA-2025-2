@@ -26,6 +26,50 @@ class Estructura(Carta):
 
     #habilidades
 
+    def morir(self, contexto):
+        nombre = self.nombre_carta.strip().lower()
+        if nombre == "recolector de agua":
+            if contexto.orden_ataca_primero == "ia":
+                nueva = contexto.instancia_jugador.obtener_tropa_aleatoria_de_coleccion()
+                if nueva:
+                    contexto.instancia_jugador.agregar_al_mazo(nueva)
+                    contexto.registro_eventos.append(f"El Recolector crea a {nueva.nombre_carta}")
+            else:
+                self._pendiente_reemplazo = True
+
+        elif nombre == "horno":
+            nueva = crear_espiritu_igneo()
+            if contexto.orden_ataca_primero == "ia":
+                contexto.instancia_jugador.agregar_al_mazo(nueva)
+                contexto.registro_eventos.append("El horno crea un Espiritu Igneo")
+            else:
+                self._pendiente_reemplazo = nueva
+
+        elif nombre == "torre bomba":
+            contexto.instancia_ia.recibir_dano(DANO_BOMBA, "estructura")
+            contexto.registro_eventos.append(f"La torre bomba explotó e hizo {DANO_BOMBA} de daño")
+
+
+
+
+def fin_de_ronda(self, contexto):
+    #recolector pospone la creacion de la carta si atacó primero el jugador
+    if getattr(self, "_pendiente_reemplazo", False) is True:
+        if contexto.instancia_jugador.hay_alguna_carta_viva():
+            nueva = contexto.instancia_jugador.obtener_tropa_aleatoria_de_coleccion()
+            if nueva:
+                contexto.instancia_jugador.agregar_al_mazo(nueva)
+                contexto.registro_eventos.append(f"Como el recolector sobrevivió trajo a {nueva.nombre_carta} por victoria/supervivencia.")
+        self._pendiente_reemplazo = False
+
+    #pospone la creacion del horno si atacó primero el jugador
+    if hasattr(self, "_pendiente_reemplazo") and self._pendiente_reemplazo not in (False, None, True):
+        if contexto.instancia_jugador.hay_alguna_carta_viva():
+            contexto.instancia_jugador.agregar_al_mazo(self._pendiente_reemplazo)
+            contexto.registro_eventos.append("Como el horno sobrevivió trajo un Espiritu Igneo por victoria/supervivencia.")
+        self._pendiente_reemplazo = None
+
+
     #cañon
 
     def inicio_de_ronda(self, contexto):
