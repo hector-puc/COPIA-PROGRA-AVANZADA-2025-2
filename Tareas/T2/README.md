@@ -35,7 +35,7 @@ El juego solo se puede jugar si en la consola ejecutas main.py en conjunto con l
         
 -   Mixta (modelado y reglas de combinación): Hecha completa
     
-    -   Vida = vida_estructura + (vida_tropa/2), mejor defensa (min de multiplicadores), ataque/mult. ataque de la tropa, prob. especial = promedio + 10% del daño actual y con oop avanzado hereda habilidades de estructura.
+    -   Vida = vida_estructura + (vida_tropa/2), mejor defensa (min de multiplicadores), ataque/mult. ataque de la tropa, prob. especial = promedio + 10% y con oop avanzado hereda habilidades de estructura.
         
 -   Jugador (atributos/atacar/recibir daño/presentarse): Hecha completa
     
@@ -148,7 +148,7 @@ En la carpeta que este al mismo nivel de main (en mi caso T2) tienen que tener: 
         
     -   Vida combinada = vida_estructura + mitad de vida_tropa;
         
-    -   Prob. especial = promedio de ambas +10% de la probabilidad inicial
+    -   Prob. especial = promedio de ambas +10% 
         
         
 7.  DeepSheep: únicamente modifica la visualización  para confundir al jugador. No altera el estado real.
