@@ -111,8 +111,8 @@ def comprar_carta(instancia_jugador, cartas_catalogo, numero_de_opcion_humano):
 
 def linea_carta_en_una_linea(carta):
     tipo_en_minusculas = carta.tipo_carta.lower()
-    vida_actual_mostrada = carta.vida_actual     
-    return f"{carta.nombre_carta} | {tipo_en_minusculas} | Vida: {vida_actual_mostrada}/{carta.vida_maxima} | Ataque: {carta.ataque} | Defensa: x{carta.multiplicador_defensa} | Probabilidad de la habilidad: x{carta.probabilidad_especial} "    
+    vida_actual_mostrada = getattr(carta, "_vida_fake", carta.vida_actual)
+    return f"{carta.nombre_carta} | {tipo_en_minusculas} | Vida: {vida_actual_mostrada}/{carta.vida_maxima} | Ataque: {round(carta.ataque,2)} | Defensa: x{round(carta.multiplicador_defensa,2)} | Probabilidad de la habilidad: x{round(carta.probabilidad_especial,2)} "    
 
 def curar_cartas(instancia_jugador):
     cartas_heridas = []

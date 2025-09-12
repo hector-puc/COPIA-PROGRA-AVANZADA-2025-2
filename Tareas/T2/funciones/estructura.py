@@ -3,8 +3,8 @@ from funciones.tropa import Tropa
 from parametros import DANO_BOMBA, CANNON_ABILITY, CANNON_DECREASE, DIE_PROB, PROB_LAPIDA
 from funciones.leer_archivos import cargar_cartas 
 
-
-def crear_espiritu_igneo(): #busca en el csv y crea al espiritu
+#busca en el csv y crea el espiritu, el barbaro y el duende
+def crear_espiritu_igneo():
     filas_cartas = cargar_cartas()
     for cartas in filas_cartas:
         nombre_en_archivo = str(cartas["nombre"]).strip().lower()
@@ -21,6 +21,42 @@ def crear_espiritu_igneo(): #busca en el csv y crea al espiritu
             return Tropa(nombre_carta = nombre_carta, tipo_carta = tipo_carta, vida_maxima = vida_maxima, multiplicador_defensa = multiplicador_defensa, precio_carta = precio_carta, probabilidad_especial = probabilidad_especial, ataque_base = ataque_base, multiplicador_ataque = multiplicador_ataque, habilidad_especial = descripcion_habilidad )
     return None
 
+#copio y pego
+
+def crear_barbaro():
+    filas_cartas = cargar_cartas()
+    for cartas in filas_cartas:
+        nombre = str(cartas["nombre"]).strip().lower()
+        if nombre == "bárbaros" or nombre == "barbaros":
+            nombre_carta = str(cartas["nombre"]).strip()
+            tipo_carta = "tropa"
+            vida_maxima = int(cartas["vida_maxima"])
+            multiplicador_defensa = float(cartas["multiplicador_defensa"])
+            precio_carta = int(cartas["precio"])
+            probabilidad_especial = float(cartas["probabilidad_especial"])
+            ataque_base = int(cartas["ataque"])
+            multiplicador_ataque = float(cartas["multiplicador_ataque"])
+            descripcion_habilidad = str(cartas["descripcion_habilidad"])
+            return Tropa(nombre_carta = nombre_carta, tipo_carta = tipo_carta, vida_maxima = vida_maxima, multiplicador_defensa = multiplicador_defensa, precio_carta = precio_carta, probabilidad_especial = probabilidad_especial, ataque_base = ataque_base, multiplicador_ataque = multiplicador_ataque, habilidad_especial = descripcion_habilidad )
+    return None
+
+
+def crear_duende():
+    filas_cartas = cargar_cartas()
+    for cartas in filas_cartas:
+        nombre = str(cartas["nombre"]).strip().lower()
+        if nombre == "duendes":
+            nombre_carta = str(cartas["nombre"]).strip()
+            tipo_carta = "tropa"
+            vida_maxima = int(cartas["vida_maxima"])
+            multiplicador_defensa = float(cartas["multiplicador_defensa"])
+            precio_carta = int(cartas["precio"])
+            probabilidad_especial = float(cartas["probabilidad_especial"])
+            ataque_base = int(cartas["ataque"])
+            multiplicador_ataque = float(cartas["multiplicador_ataque"])
+            descripcion_habilidad = str(cartas["descripcion_habilidad"])
+            return Tropa(nombre_carta = nombre_carta, tipo_carta = tipo_carta, vida_maxima = vida_maxima, multiplicador_defensa = multiplicador_defensa, precio_carta = precio_carta, probabilidad_especial = probabilidad_especial, ataque_base = ataque_base, multiplicador_ataque = multiplicador_ataque, habilidad_especial = descripcion_habilidad )
+    return None
 
 class Estructura(Carta):
 
@@ -99,12 +135,33 @@ class Estructura(Carta):
                     contexto.instancia_jugador.agregar_al_mazo(espiritu)
                     contexto.registro_eventos.append("El horno crea un espiritu igneo")
                 else:
-                    self.reemplazo_pendiente = espiritu
+                    self.reemplazo_pendiente = "espiritu igneo"
 
         #torre Bomba
         elif nombre_normal == "torre bomba":
             contexto.instancia_ia.recibir_dano(DANO_BOMBA, "estructura")
             contexto.registro_eventos.append(f"La torre Bomba hace una explosión que hace {DANO_BOMBA} de daño a la IA.")
+
+        #cuartel de barbaros
+        elif nombre_normal == "cuartel de bárbaros" or nombre_normal == "cuartel de barbaros":
+            barbaro = crear_barbaro()
+            if barbaro:
+                if contexto.orden_ataca_primero == "ia":
+                    contexto.instancia_jugador.agregar_al_mazo(barbaro)
+                    contexto.registro_eventos.append("El Cuartel de Bárbaros crea un barbaro")
+                else:
+                    self.reemplazo_pendiente = "barbaros"
+
+        #cuartel de duendes
+        elif nombre_normal == "cuartel de duendes":
+            duende = crear_duende()
+            if duende:
+                if contexto.orden_ataca_primero == "ia":
+                    contexto.instancia_jugador.agregar_al_mazo(duende)
+                    contexto.registro_eventos.append("El Cuartel de Duendes crea un duende")
+                else:
+                    self.reemplazo_pendiente = "duendes"
+
 
     def fin_de_ronda(self, contexto):
         if self.reemplazo_pendiente == "recolector":
@@ -115,11 +172,28 @@ class Estructura(Carta):
                     contexto.registro_eventos.append(f"El recolector hace que entre: {nueva_tropa.nombre_carta} por victoria o supervivencia.")
             self.reemplazo_pendiente = False
 
-        elif isinstance(self.reemplazo_pendiente, Tropa):
+        elif self.reemplazo_pendiente == "espiritu igneo":
             if contexto.instancia_jugador.hay_alguna_carta_viva():
                 contexto.instancia_jugador.agregar_al_mazo(self.reemplazo_pendiente)
                 contexto.registro_eventos.append("El horno crea un Espiritu igneo por victoria o supervivencia.")
             self.reemplazo_pendiente = None
+        
+        elif self.reemplazo_pendiente == "barbaros":
+            barbaro = crear_barbaro()
+            if barbaro:
+                if contexto.instancia_jugador.hay_alguna_carta_viva():
+                    contexto.instancia_jugador.agregar_al_mazo(barbaro)
+                    contexto.registro_eventos.append("El Cuartel de Bárbaros crea Bárbaros por victoria o supervivencia.")
+            self.reemplazo_pendiente = False
+
+        elif self.reemplazo_pendiente == "duendes":
+            duende = crear_duende()
+            if duende:
+                if contexto.instancia_jugador.hay_alguna_carta_viva():
+                    contexto.instancia_jugador.agregar_al_mazo(duende)
+                    contexto.registro_eventos.append("El Cuartel de Duendes crea Duendes por victoria o supervivencia.")
+            self.reemplazo_pendiente = False
+
 
         #revertir efectos del cañon
         if self._respaldo_canon is not None:

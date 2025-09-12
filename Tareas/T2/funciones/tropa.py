@@ -39,6 +39,11 @@ class Tropa(Carta):
         if contexto.instancia_ia.vida <= 0:
             return
         
+        #el bloqueo de Crok no ataca
+        if getattr(self, "_turnos_inhabilitada", 0) > 0:
+            contexto.registro_eventos.append(f"{self.nombre_carta} está inhabilitada ({self._turnos_inhabilitada} rondas restantes) y no ataca.")
+            return
+
         nombre_normal = self.nombre_carta.strip().lower().replace(".", "")
 
         
@@ -138,7 +143,7 @@ class Tropa(Carta):
         
         elif nombre_normal == "globo":
             contexto.instancia_ia.recibir_dano(dano_base, "tropa")
-            contexto.registro_eventos.append("Globo atacó (si muere, puede dejar bomba).")
+            contexto.registro_eventos.append("Globo atacó y si muere puede dejar bomba")
 
 
         elif nombre_normal in ("escuadron de esqueletos", "escuadrón de esqueletos"):

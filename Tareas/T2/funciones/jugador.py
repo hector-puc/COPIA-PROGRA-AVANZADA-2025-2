@@ -33,7 +33,8 @@ class Jugador:
         estructuras_vivas = []
         for i in self.mazo:
             if i.vida_actual > 0 and i.tipo_carta in ("estructura", "mixta"):
-                estructuras_vivas.append(i)
+                if getattr(i, "_turnos_inhabilitada", 0) == 0: #crok inhabilita cosas
+                    estructuras_vivas.append(i)
         return estructuras_vivas
 
 
@@ -98,7 +99,7 @@ class Jugador:
 
         lista_tropas_vivas = []
         for i in self.cartas_vivas():
-            if i.tipo_carta == "tropa":
+            if i.tipo_carta == "tropa" and getattr(i, "_turnos_inhabilitada", 0) == 0: #crok inhabilita cartas
                 lista_tropas_vivas.append(i)
             
         if len(lista_tropas_vivas) == 0:
@@ -106,13 +107,16 @@ class Jugador:
 
         dano_base_por_tropa = dano_total * multiplicador_ataque_tropa
 
-        for carta_tropa in (lista_tropas_vivas):
-            dano_contra_tropa = dano_base_por_tropa * multiplicador_ataque_tropa
+        indice_tropa = 0
+        while indice_tropa < len(lista_tropas_vivas):
+            carta_tropa = lista_tropas_vivas[indice_tropa]
+            dano_contra_tropa = dano_base_por_tropa
             dano_en_tropa = carta_tropa.recibir_dano(int(round(dano_contra_tropa)))
             dano_total_efectivo += dano_en_tropa
 
             if carta_tropa.vida_actual <= 0:
                 self.remover_carta_muerta_del_mazo(carta_tropa)
+            indice_tropa += 1
 
         return dano_total_efectivo
 
@@ -121,6 +125,9 @@ class Jugador:
             self.coleccion.remove(objeto_carta)
             self.mazo.append(objeto_carta)
             return True
+        #esto agrega a los espiritus/barbaros/duendes que fueron creados por estructuras pero tiene que tener espacio en el mazo
+        elif objeto_carta not in self.coleccion and objeto_carta not in self.mazo and len(self.mazo) < 5: 
+            self.mazo.append(objeto_carta)
         return False
 
     def hay_alguna_carta_viva(self):
@@ -135,4 +142,30 @@ class Jugador:
                 return i
         return None
     
-    
+    def __str__(self): #al final creo que esto no lo uso nunca pero lo hice pq lo pedia el enunciado 
+        lineas = []
+        lineas.append(f"Jugador - {self.nombre_jugador} | Tienes: {self.oro_disponible}G")
+
+        lineas.append("\nCartas en colección:")
+        if len(self.coleccion) == 0:
+            lineas.append("sin cartas en colección")
+        else:
+            indice = 0
+            while indice < len(self.coleccion):
+                i = self.coleccion[indice]
+                linea_carta = f"{i.nombre_carta} | {i.tipo_carta} | Vida: {i.vida_actual}/{i.vida_maxima}"
+                lineas.append(f"({indice + 1}) {linea_carta}")
+                indice += 1
+
+        lineas.append("\nCartas en mazo:")
+        if len(self.mazo) == 0:
+            lineas.append("sin cartas en mazo")
+        else:
+            indice = 0
+            while indice < len(self.mazo):
+                i = self.mazo[indice]
+                linea_carta = f"{i.nombre_carta} | {i.tipo_carta} | Vida: {i.vida_actual}/{i.vida_maxima}"
+                lineas.append(f"({indice + 1}) {linea_carta}")
+                indice += 1
+
+        return "\n".join(lineas)

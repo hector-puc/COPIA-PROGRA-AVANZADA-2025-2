@@ -2,20 +2,22 @@ from .carta import Carta
 from .tropa import Tropa
 from .estructura import Estructura
 from random import random
+from parametros import COSTO_COMBINACION
 
 class Mixta(Tropa):
 
     def __init__(self, instancia_tropa: Tropa, instancia_estructura: Estructura):
 
         if not isinstance(instancia_tropa, Tropa):
-            print("instancia_tropa debe ser una Tropa válida")
+            print("Tienes que elegir una tropa válida")
             pass
         if not isinstance(instancia_estructura, Estructura):
-            print("instancia_estructura debe ser una Estructura válida")
+            print("Tienes que elegir una estructura válida")
             pass
 
         self.tropa_base = instancia_tropa
         self.estructura_base = instancia_estructura
+        self.respaldo_mixta = None
 
         vida_maxima_combinada = int(round(instancia_estructura.vida_maxima + (instancia_tropa.vida_maxima // 2)))
 
@@ -27,14 +29,13 @@ class Mixta(Tropa):
         nombre_carta = f"{instancia_tropa.nombre_carta}-{instancia_estructura.nombre_carta}"
         habilidad_especial_combinada = f"{instancia_tropa.usar_habilidad_especial} + {instancia_estructura.usar_habilidad_especial}"
 
-        precio_mixto = 0 #por cambiar
         
         super().__init__(
             nombre_carta = nombre_carta,
             tipo_carta = "mixta",
             vida_maxima = vida_maxima_combinada,
             multiplicador_defensa = multiplicador_defensa_combinado,
-            precio_carta = precio_mixto,
+            precio_carta = COSTO_COMBINACION,
             probabilidad_especial = probabilidad_especial_combinada,
             ataque_base = ataque_base_combinado,
             multiplicador_ataque = multiplicador_ataque_combinado,
@@ -61,3 +62,28 @@ class Mixta(Tropa):
                 f"Multiplicador Ataque: x{self.multiplicador_ataque}, "
                 f"Multiplicador Defensa: x{self.multiplicador_defensa}, "
                 f"Probabilidad Especial: {self.probabilidad_especial}%")
+    
+
+    #esto ejecuta las habilidades de inicio de ronda de la estructura
+
+    def inicio_de_ronda(self, contexto):
+        if hasattr(self.estructura_base, "inicio_de_ronda"):
+            defensa_antes = getattr(self.estructura_base, "multiplicador_defensa", self.multiplicador_defensa)
+            self.estructura_base.inicio_de_ronda(contexto)
+            self.multiplicador_defensa = getattr(self.estructura_base, "multiplicador_defensa", defensa_antes)
+
+    def antes_de_recibir_dano(self, contexto) -> bool:
+        if hasattr(self.estructura_base, "antes_de_recibir_dano"):
+            if self.estructura_base.antes_de_recibir_dano(contexto):
+                return True
+        return False
+
+    def morir(self, contexto):
+        if hasattr(self.estructura_base, "morir"):
+            self.estructura_base.morir(contexto)
+
+    def fin_de_ronda(self, contexto):
+        if hasattr(self.estructura_base, "fin_de_ronda"):
+            self.estructura_base.fin_de_ronda(contexto)
+        self.multiplicador_defensa = getattr(self.estructura_base, "multiplicador_defensa", self.multiplicador_defensa)
+

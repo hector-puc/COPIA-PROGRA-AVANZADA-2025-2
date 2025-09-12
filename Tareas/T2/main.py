@@ -129,9 +129,11 @@ def menu_inventario(jugador):
             for i in jugador.mazo:
                 if i.nombre_carta == candidato.nombre_carta:
                     print("No puedes tener la misma carta")
-                    continue
+                    break
             jugador.mazo.append(candidato)
             print(f"Agregaste al mazo a: {candidato.nombre_carta}")
+            jugador.coleccion.remove(candidato)
+            
 
         elif opcion == "2":
             if not jugador.mazo:
@@ -188,7 +190,9 @@ def ejecutar_una_ronda(jugador, lista_ias, indice_ia_actual):
     if not jugador.mazo:
         return indice_ia_actual
 
-    print(f"\n--- COMIENZA LA RONDA CONTRA {ia.nombre}\n")
+    print(f"\n--- COMIENZA LA RONDA CONTRA {ia.nombre} ----")
+    print(f"Vida IA: {ia.vida}/{ia.vida_maxima}")
+
     contexto.ejecutar_ronda_ccontexto(jugador, ia, jugador.mazo)
 
     jugador.oro_disponible += ORO_POR_RONDA
@@ -206,6 +210,7 @@ def menu_principal(jugador, lista_ias):
     mismo_catalogo = None 
 
     while True:
+        
         print("\n---------------------------------")
         print("         MENÚ PRINCIPAL:         ")
         print("---------------------------------\n")

@@ -31,17 +31,6 @@ def velocidad(instancia_ia, cartas_activas_del_jugador):
 
 def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, cartas_activas):
 
-    objeto_backup_ia = {"multiplicadores_defensa": instancia_ia.multiplicadores_defensa.copy(), "multiplicadores_ataque": instancia_ia.multiplicadores_ataque.copy(), "ataque": instancia_ia.ataque, "velocidad": getattr(instancia_ia, "velocidad", 0.0),} 
-
-    objeto_backup_jugador = {
-        id(c): (
-            c.multiplicador_defensa,
-            getattr(c, "multiplicador_ataque", None),
-            getattr(c, "ataque", None),
-        )
-        for c in cartas_activas
-}
-
     orden_inicial = velocidad(instancia_ia, cartas_activas)
 
     objeto_contexto_ronda = Contexto(instancia_jugador = instancia_jugador, instancia_ia = instancia_ia, lista_cartas_aliadas = cartas_activas, orden_ataca_primero = orden_inicial,   generador_aleatorio = random, registro_eventos = [] )
@@ -60,7 +49,6 @@ def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, cartas_activas):
 
     objeto_contexto_ronda.registro_eventos.append(f"Ataca primero: {objeto_contexto_ronda.orden_ataca_primero}")
 
-    #JUGADOR USA TODAS LAS CARTAS CON ATACAR
 
     if objeto_contexto_ronda.orden_ataca_primero == "jugador":
 
@@ -96,10 +84,13 @@ def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, cartas_activas):
 
     
     setattr(instancia_ia, "_inhabilitada_esta_ronda", False)
+    for i in cartas_activas:
+        if hasattr(i, "_turnos_inhabilitada"):
+            if i._turnos_inhabilitada > 0:
+                i._turnos_inhabilitada -= 1
 
     
     for mensaje in objeto_contexto_ronda.registro_eventos:
         print(mensaje)
 
-    
     return
