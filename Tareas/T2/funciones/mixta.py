@@ -25,7 +25,7 @@ class Mixta(Tropa):
         multiplicador_defensa_combinado = min(instancia_tropa.multiplicador_defensa, instancia_estructura.multiplicador_defensa)
         multiplicador_ataque_combinado = instancia_tropa.multiplicador_ataque
         ataque_base_combinado = instancia_tropa.ataque_base
-        probabilidad_especial_combinada = ((instancia_tropa.probabilidad_especial + instancia_estructura.probabilidad_especial) / 2.0 * 1.10)
+        probabilidad_especial_combinada = round(((instancia_tropa.probabilidad_especial + instancia_estructura.probabilidad_especial) / 2.0 + 10 ))
         nombre_carta = f"{instancia_tropa.nombre_carta}-{instancia_estructura.nombre_carta}"
         habilidad_especial_combinada = f"{instancia_tropa.usar_habilidad_especial} + {instancia_estructura.usar_habilidad_especial}"
 

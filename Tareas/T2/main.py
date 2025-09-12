@@ -1,4 +1,4 @@
-import sys
+from sys import exit, argv
 from parametros import ORO_POR_RONDA, ORO_POR_VICTORIA  
 from funciones.leer_archivos import cargar_ias
 from menus import cargar_cargas_archivo, catalogo_sin_repetir_nombres
@@ -212,6 +212,10 @@ def menu_principal(jugador, lista_ias):
     mismo_catalogo = None 
 
     while True:
+        if indice_ia_actual >= len(lista_ias):
+            print("No quedan IAs! Ganaste el juego :D")
+            exit(0)
+
         print("\nEstado actual:")
         print(f"Jugador - {jugador.nombre_jugador}| Tienes: {jugador.oro_disponible}G\n")
         
@@ -262,15 +266,15 @@ def menu_principal(jugador, lista_ias):
 
 # inicio
 def principio():
-    if len(sys.argv) < 3:
+    if len(argv) < 3:
         print("Busca la forma correcta de ejecutar el programa")
         return
 
-    argumento_1 = sys.argv[1].strip().lower()
+    argumento_1 = argv[1].strip().lower()
 
     if argumento_1 in ("facil", "normal", "dificil"):
         dificultad = argumento_1
-        nombre_jugador = sys.argv[2].strip()
+        nombre_jugador = argv[2].strip()
 
         jugador = Jugador(nombre_jugador)
 
