@@ -20,7 +20,15 @@ def construir_carta_desde_fila(fila_de_cartas):
         ataque_base_desde_archivo = int(fila_de_cartas["ataque"])
         multiplicador_ataque_desde_archivo = float(fila_de_cartas["multiplicador_ataque"])
         descripcion_habilidad_desde_archivo = str(fila_de_cartas["descripcion_habilidad"])
-        instancia_carta = Tropa(nombre_carta = nombre_carta_desde_archivo, tipo_carta = "tropa", vida_maxima = vida_maxima_desde_archivo, multiplicador_defensa = multiplicador_defensa_desde_archivo, precio_carta = precio_carta_desde_archivo, probabilidad_especial = probabilidad_especial_desde_archivo, ataque_base = ataque_base_desde_archivo, multiplicador_ataque = multiplicador_ataque_desde_archivo, habilidad_especial = descripcion_habilidad_desde_archivo)
+        instancia_carta = Tropa(nombre_carta = nombre_carta_desde_archivo, 
+                                tipo_carta = "tropa",
+                                vida_maxima = vida_maxima_desde_archivo,
+                                multiplicador_defensa = multiplicador_defensa_desde_archivo, 
+                                precio_carta = precio_carta_desde_archivo, 
+                                probabilidad_especial = probabilidad_especial_desde_archivo, 
+                                ataque_base = ataque_base_desde_archivo, 
+                                multiplicador_ataque = multiplicador_ataque_desde_archivo, 
+                                habilidad_especial = descripcion_habilidad_desde_archivo)
         return instancia_carta
 
     else:
@@ -28,7 +36,15 @@ def construir_carta_desde_fila(fila_de_cartas):
         multiplicador_ataque_desde_archivo = 0.0
         descripcion_habilidad_desde_archivo = str(fila_de_cartas["descripcion_habilidad"])
 
-        instancia_carta = Estructura(nombre_carta = nombre_carta_desde_archivo, tipo_carta = "estructura", vida_maxima = vida_maxima_desde_archivo, multiplicador_defensa = multiplicador_defensa_desde_archivo, precio_carta = precio_carta_desde_archivo, probabilidad_especial = probabilidad_especial_desde_archivo, ataque_base = ataque_base_desde_archivo, multiplicador_ataque = multiplicador_ataque_desde_archivo, habilidad_especial = descripcion_habilidad_desde_archivo )
+        instancia_carta = Estructura(nombre_carta = nombre_carta_desde_archivo,
+                                      tipo_carta = "estructura", 
+                                      vida_maxima = vida_maxima_desde_archivo, 
+                                      multiplicador_defensa = multiplicador_defensa_desde_archivo, 
+                                      precio_carta = precio_carta_desde_archivo, 
+                                      probabilidad_especial = probabilidad_especial_desde_archivo, 
+                                      ataque_base = ataque_base_desde_archivo, 
+                                      multiplicador_ataque = multiplicador_ataque_desde_archivo, 
+                                      habilidad_especial = descripcion_habilidad_desde_archivo )
         return instancia_carta
 
 # catalogo cartas
@@ -56,8 +72,10 @@ def catalogo_sin_repetir_nombres(cartas, cartas_jugador):
     if len(filas_posibles) == 0:
         return []
     
-    
-    filas_elegidas = sample(filas_posibles, 4) #siempre da 4 opciones de carta como el mazo
+    if len(filas_posibles) >= 4:
+        filas_elegidas = sample(filas_posibles, 4) #siempre da 4 opciones de carta como el mazo
+    else:
+        filas_elegidas = sample(filas_posibles, len(filas_posibles)) #si quedan menos de 4 cartas para elegir
 
 
     lista_catalogo = []
@@ -91,10 +109,10 @@ def comprar_carta(instancia_jugador, cartas_catalogo, numero_de_opcion_humano):
 
     # verificar que no la tenga ya en su coleccion
     nombres_cartas_coleccion = []
-    indice_recorre_coleccion = 0
-    while indice_recorre_coleccion < len(instancia_jugador.coleccion):
-        nombres_cartas_coleccion.append(instancia_jugador.coleccion[indice_recorre_coleccion].nombre_carta)
-        indice_recorre_coleccion += 1
+    indice = 0
+    while indice < len(instancia_jugador.coleccion):
+        nombres_cartas_coleccion.append(instancia_jugador.coleccion[indice].nombre_carta)
+        indice += 1
 
     if carta_para_comprar.nombre_carta in nombres_cartas_coleccion:
         print("Ya tienes esa carta :p")
@@ -112,16 +130,23 @@ def comprar_carta(instancia_jugador, cartas_catalogo, numero_de_opcion_humano):
 def linea_carta_en_una_linea(carta):
     tipo_en_minusculas = carta.tipo_carta.lower()
     vida_actual_mostrada = getattr(carta, "_vida_fake", carta.vida_actual)
-    return f"{carta.nombre_carta} | {tipo_en_minusculas} | Vida: {vida_actual_mostrada}/{carta.vida_maxima} | Ataque: {round(carta.ataque,2)} | Defensa: x{round(carta.multiplicador_defensa,2)} | Probabilidad de la habilidad: x{round(carta.probabilidad_especial,2)} "    
+    return f"{carta.nombre_carta} | {tipo_en_minusculas} | Vida: {vida_actual_mostrada}/{carta.vida_maxima} | Ataque: {round(carta.ataque,2)} | Defensa: x{round(carta.multiplicador_defensa,2)} | Prob. de la habilidad: {(round(carta.probabilidad_especial,2))*100}% "    
 
 def curar_cartas(instancia_jugador):
     cartas_heridas = []
     indice = 0
+    indice_2 = 0
     while indice < len(instancia_jugador.coleccion):
         temporal = instancia_jugador.coleccion[indice]
-        if temporal.vida_actual > 0 and temporal.vida_actual < temporal.vida_maxima:
+        if temporal.vida_actual >= 0 and temporal.vida_actual < temporal.vida_maxima:
             cartas_heridas.append(temporal)
         indice += 1
+    while indice_2 < len(instancia_jugador.mazo):
+        temporal_2 = instancia_jugador.mazo[indice_2]
+        if temporal_2.vida_actual >= 0 and temporal_2.vida_actual < temporal_2.vida_maxima:
+            if temporal_2 not in cartas_heridas:
+                cartas_heridas.append(temporal_2)
+        indice_2 += 1
 
     if len(cartas_heridas) == 0:
         print("No tienes cartas que curar (god).")

@@ -1,7 +1,8 @@
 import sys
 from parametros import ORO_POR_RONDA, ORO_POR_VICTORIA  
 from funciones.leer_archivos import cargar_ias
-from menus import cargar_cargas_archivo, catalogo_sin_repetir_nombres, construir_carta_desde_fila, tienda_menu, mover_del_mazo_a_coleccion, linea_carta_en_una_linea
+from menus import cargar_cargas_archivo, catalogo_sin_repetir_nombres
+from menus import tienda_menu, mover_del_mazo_a_coleccion, linea_carta_en_una_linea
 from funciones.jugador import Jugador
 from funciones.ia import IA
 from funciones import contexto
@@ -86,9 +87,9 @@ def seleccion_inicial_mazo(jugador): #decidi que la seleccion sea igual de 4 car
             continue
 
         carta_elegida = sugerencias[n - 1]
-        #agrega a mazo y coleccion
-        jugador.coleccion.append(carta_elegida)
+        #agrega a mazo 
         jugador.mazo.append(carta_elegida)
+
         print(f"Agregada: {carta_elegida.nombre_carta}")
 
     print("Primeras cartas elegidas, bien hecho :DD")
@@ -150,9 +151,10 @@ def menu_inventario(jugador):
             if indice < 1 or indice > len(jugador.mazo):
                 print("Elige bien 😡")
                 continue
-            quitada = jugador.mazo.pop(indice - 1)
-            print(f"Eliminaste del mazo a: {quitada.nombre_carta}\n")
-            mover_del_mazo_a_coleccion(jugador, quitada)
+            carta_a_mover = jugador.mazo[indice - 1]
+            mover_del_mazo_a_coleccion(jugador, carta_a_mover)
+            print(f"Eliminaste del mazo a: {carta_a_mover.nombre_carta}\n")
+            
 
         #para reordenar el mazo lo que pense fue que el usuario lo elija, es decir, que elija la posicion desde donde
         #quiere mover la carta y la posicion a donde quiere moverla (comenzando desde la posicion 1)
@@ -210,6 +212,8 @@ def menu_principal(jugador, lista_ias):
     mismo_catalogo = None 
 
     while True:
+        print("\nEstado actual:")
+        print(f"Jugador - {jugador.nombre_jugador}| Tienes: {jugador.oro_disponible}G\n")
         
         print("\n---------------------------------")
         print("         MENÚ PRINCIPAL:         ")

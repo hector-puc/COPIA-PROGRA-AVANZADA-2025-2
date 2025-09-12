@@ -26,6 +26,7 @@ class Jugador:
                 return False
             carta_seleccionada = self.coleccion[indice_en_coleccion]
             self.mazo.append(carta_seleccionada)
+            self.coleccion.remove(carta_seleccionada)
             return True
         return False
     
