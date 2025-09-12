@@ -373,19 +373,16 @@ def tienda_menu(instancia_jugador, lista_catalogo = None):
         if numero_opcion == cantidad_de_opciones_de_compra + 1:
             curar_cartas(instancia_jugador)
             continue
-
         #revivir
         if numero_opcion == cantidad_de_opciones_de_compra + 2:
             revivir_carta(instancia_jugador)
             continue
-
         #reroll
         if numero_opcion == cantidad_de_opciones_de_compra + 3:
             if instancia_jugador.oro_disponible < COSTO_REROLL:
                 print("No tienes oro suficiente D:")
                 continue
             instancia_jugador.oro_disponible -= COSTO_REROLL
-
             lista_que_se_tienen = []
             indice = 0
             while indice < len(instancia_jugador.coleccion):
@@ -395,10 +392,8 @@ def tienda_menu(instancia_jugador, lista_catalogo = None):
             lista_catalogo = catalogo_sin_repetir_nombres(cartas, lista_que_se_tienen)
             print("Reroll hecho ! :)")
             continue
-
         #taller
         if numero_opcion == cantidad_de_opciones_de_compra + 4:
             taller_combinar(instancia_jugador)
             continue
-
         print("Elige bien 😡")
