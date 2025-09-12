@@ -55,18 +55,10 @@ def catalogo_sin_repetir_nombres(cartas, cartas_jugador):
 
     if len(filas_posibles) == 0:
         return []
+    
+    
+    filas_elegidas = sample(filas_posibles, 4) #siempre da 4 opciones de carta como el mazo
 
-    cantidad_mininma = 3
-    cantidas_maxima = 5
-
-    cantidad_final = cantidad_mininma
-    if len(filas_posibles) > cantidad_mininma: #debug
-        limite_maximo = cantidas_maxima
-        if len(filas_posibles) < cantidas_maxima:
-            limite_maximo = len(filas_posibles)
-        cantidad_final = randint(cantidad_mininma, limite_maximo)
-
-    filas_elegidas = sample(filas_posibles, cantidad_final)
 
     lista_catalogo = []
     indice_construccion = 0
@@ -79,15 +71,12 @@ def catalogo_sin_repetir_nombres(cartas, cartas_jugador):
 
 
 def mostrar_catalogo(cartas_catalogo):
-    print("TIENDA")
-    print("-----------------------------")
-    print("Cartas disponibles:")
-
-    indice = 0
-    while indice < len(cartas_catalogo):
-        carta_actual = cartas_catalogo[indice]
-        numero_opcion = indice + 1
-        print(f"[{numero_opcion}] {carta_actual.nombre_carta} ---- {carta_actual.precio_carta}G")
+    print("\nCartas disponibles:\n")
+    
+    indice = 1
+    while indice <= len(cartas_catalogo):
+        carta_actual = cartas_catalogo[indice - 1]
+        print(f"[{indice}] {linea_carta_en_una_linea(carta_actual)} --- {carta_actual.precio_carta}G")
         indice += 1
 
 #tienda
@@ -120,6 +109,10 @@ def comprar_carta(instancia_jugador, cartas_catalogo, numero_de_opcion_humano):
     print(f"Compraste {carta_para_comprar.nombre_carta} por {carta_para_comprar.precio_carta}G.")
     return True
 
+def linea_carta_en_una_linea(carta):
+    tipo_en_minusculas = carta.tipo_carta.lower()
+    vida_actual_mostrada = carta.vida_actual     
+    return f"{carta.nombre_carta} | {tipo_en_minusculas} | Vida: {vida_actual_mostrada}/{carta.vida_maxima} | Ataque: {carta.ataque} | Defensa: x{carta.multiplicador_defensa} | Probabilidad de la habilidad: x{carta.probabilidad_especial} "    
 
 def curar_cartas(instancia_jugador):
     cartas_heridas = []
@@ -139,11 +132,11 @@ def curar_cartas(instancia_jugador):
         return False
 
     print("Cartas con daño:")
-    indice_muestra = 0
-    while indice_muestra < len(cartas_heridas):
-        carta_danada = cartas_heridas[indice_muestra]
-        print(f"[{indice_muestra+1}] {carta_danada.nombre_carta} {carta_danada.vida_actual}/{carta_danada.vida_maxima} HP")
-        indice_muestra += 1
+    indice = 0
+    while indice < len(cartas_heridas):
+        carta_danada = cartas_heridas[indice]
+        print(f"[{indice+1}] {linea_carta_en_una_linea(carta_danada)} {carta_danada.vida_actual}/{carta_danada.vida_maxima} HP")
+        indice += 1
 
     carta_a_curar = input(f"Elige carta a curar (costo {COSTO_CURAR}G) o 0 para volver: ").strip()
     if not carta_a_curar.isdigit():
@@ -181,12 +174,12 @@ def revivir_carta(instancia_jugador):
         return False
 
     print("Cartas en el lobby:")
-    indice_muestra = 0
-    while indice_muestra < len(lista_de_cartas_muertas):
-        carta_muerta = lista_de_cartas_muertas[indice_muestra]
+    indice = 0
+    while indice < len(lista_de_cartas_muertas):
+        carta_muerta = lista_de_cartas_muertas[indice]
         costo_revivir_individual = int(round(carta_muerta.precio_carta * COSTO_REVIVIR))
-        print(f"[{indice_muestra+1}] {carta_muerta.nombre_carta} (revivir: {costo_revivir_individual}G)")
-        indice_muestra += 1
+        print(f"[{indice+1}] {linea_carta_en_una_linea(carta_muerta)} (revivir: {costo_revivir_individual}G)")
+        indice += 1
 
     entrada_usuario_revivir = input("Elige carta a revivir o 0 para volver: ").strip()
     if not entrada_usuario_revivir.isdigit():
@@ -237,14 +230,14 @@ def taller_combinar(instancia_jugador):
         print("No tienes oro suficiente para combinar :pp")
         return False
 
-    print("Tropas disponibles:")
-    indice_muestra = 0
-    while indice_muestra < len(lista_tropas):
-        tropa_actual = lista_tropas[indice_muestra]
-        print(f"[{indice_muestra+1}] {tropa_actual.nombre_carta}")
-        indice_muestra += 1
+    print("\nTropas disponibles:\n")
+    indice = 0
+    while indice < len(lista_tropas):
+        tropa_actual = lista_tropas[indice]
+        print(f"[{indice+1}] {linea_carta_en_una_linea(tropa_actual)} --- Precio combinación: {COSTO_COMBINACION}G")
+        indice += 1
 
-    entrada_usuario_tropa = input("Elige la tropa (número) o 0 para volver: ").strip()
+    entrada_usuario_tropa = input("\nElige la tropa (número) o 0 para volver: \n").strip()
     if not entrada_usuario_tropa.isdigit():
         print("Elige bien 😡")
         return False
@@ -252,20 +245,20 @@ def taller_combinar(instancia_jugador):
     numero_tropa_elegida = int(entrada_usuario_tropa)
     if numero_tropa_elegida == 0:
         print("Volviendo al menu...")
-        print("----------------")
+        print("----------------\n")
         return False
     if numero_tropa_elegida < 1 or numero_tropa_elegida > len(lista_tropas):
         print("Elige bien 😡")
         return False
 
-    print("Estructuras disponibles:")
-    indice_muestra = 0
-    while indice_muestra < len(lista_estructuras):
-        estructura_actual = lista_estructuras[indice_muestra]
-        print(f"[{indice_muestra+1}] {estructura_actual.nombre_carta}")
-        indice_muestra += 1
+    print("\nEstructuras disponibles:\n")
+    indice = 0
+    while indice < len(lista_estructuras):
+        estructura_actual = lista_estructuras[indice]
+        print(f"[{indice+1}] {linea_carta_en_una_linea(estructura_actual)} --- Precio combinación: {COSTO_COMBINACION}G")
+        indice += 1
 
-    estructura_numero = input("Elige la estructura o 0 para volver: ").strip()
+    estructura_numero = input("\nElige la estructura o 0 para volver: \n").strip()
     if not estructura_numero.isdigit():
         print("Elige bien 😡")
         return False
@@ -321,10 +314,10 @@ def tienda_menu(instancia_jugador, lista_catalogo = None):
         lista_catalogo = catalogo_sin_repetir_nombres(cartas, lista_que_se_tienen)
 
     while True:
-        print("----------------------")
+        print("\n----------------------")
         print("TIENDA")
-        print("----------------------")
         print(f"Dinero disponible: {instancia_jugador.oro_disponible}G")
+        print("----------------------\n")
 
         mostrar_catalogo(lista_catalogo)
 

@@ -40,7 +40,7 @@ def ejecutar_ronda_ccontexto(instancia_jugador, instancia_ia, cartas_activas):
             getattr(c, "ataque", None),
         )
         for c in cartas_activas
-    }
+}
 
     orden_inicial = velocidad(instancia_ia, cartas_activas)
 

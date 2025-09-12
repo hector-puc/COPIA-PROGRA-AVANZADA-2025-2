@@ -1,10 +1,11 @@
 from .carta import Carta
+from parametros import DINERO_INICIAL
 
 class Jugador:
     def __init__(self, nombre_jugador: str):
         
         self.nombre_jugador = nombre_jugador
-        self.oro_disponible = 15
+        self.oro_disponible = DINERO_INICIAL
 
         #15 de oro inicial
         
@@ -66,33 +67,35 @@ class Jugador:
         dano_total_efectivo = 0
         blanco_prioritario = self.obtener_estructuras_y_mixtas_vivas() 
 
-        if hasattr(carta_objetivo, "antes_de_recibir_dano"):
-            if carta_objetivo.antes_de_recibir_dano(contexto):
-                return
+        
 
         if len(blanco_prioritario) > 0:
             danio_base_por_carta = dano_total / len(blanco_prioritario)
 
         
             for carta_objetivo in (blanco_prioritario):
+                if hasattr(carta_objetivo, "antes_de_recibir_dano"):
+                    if carta_objetivo.antes_de_recibir_dano(contexto):
+                        continue
+            
                 if carta_objetivo.tipo_carta == "estructura":
                     dano_contra_esta_carta = danio_base_por_carta * multiplicador_ataque_estructura
                 elif carta_objetivo.tipo_carta == "mixta":
                     dano_contra_esta_carta = danio_base_por_carta * multiplicador_mixta
 
-                # cada carta tiene su propia defensa
+                #cada carta tiene su propia defensa
                 dano_en_esta_carta = carta_objetivo.recibir_dano(int(round(dano_contra_esta_carta)))
                 dano_total_efectivo += dano_en_esta_carta
 
-                # si murio se va del mazo
+                #si murio se va del mazo
                 if carta_objetivo.vida_actual <= 0:
                     carta_objetivo.morir(contexto)
                     self.remover_carta_muerta_del_mazo(carta_objetivo)
 
             return dano_total_efectivo
 
-        #como el enunciado si el reparto es equitativo entre las tropas o solo a una lo hice para que sea reparto equitativo
-        
+        #si no hay estructuras o mixtas vivas
+
         lista_tropas_vivas = []
         for i in self.cartas_vivas():
             if i.tipo_carta == "tropa":
@@ -101,7 +104,7 @@ class Jugador:
         if len(lista_tropas_vivas) == 0:
             return 0
 
-        dano_base_por_tropa = dano_total / len(lista_tropas_vivas)
+        dano_base_por_tropa = dano_total * multiplicador_ataque_tropa
 
         for carta_tropa in (lista_tropas_vivas):
             dano_contra_tropa = dano_base_por_tropa * multiplicador_ataque_tropa
@@ -131,4 +134,5 @@ class Jugador:
             if getattr(i, "tipo_carta", "").lower() == "tropa":
                 return i
         return None
-
+    
+    

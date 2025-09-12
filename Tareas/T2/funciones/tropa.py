@@ -162,14 +162,14 @@ class Tropa(Carta):
     def antes_de_ataque_del_jugador(self, contexto):
         if self.nombre_carta.strip().lower() == "montapatos" and self.vida_actual > 0:
             contexto.orden_ataca_primero = "jugador"
-            contexto.registro_eventos.append("Montapatos asegura que atacas primero.")
+            contexto.registro_eventos.append("Montapatos asegura que atacas primero!")
 
     def antes_de_recibir_dano(self, contexto) -> bool:
         nombre_normal = self.nombre_carta.strip().lower()
         #espiritu puede evadir daño
         if nombre_normal in ("espiritu igneo", "espirituigneo"):
             if contexto.generador_aleatorio() < PROB_FIRE:
-                contexto.registro_eventos.append("Espíritu Ígneo evadió el daño.")
+                contexto.registro_eventos.append("Espíritu Ígneo evadió el daño")
                 return True  #no hay daño
 
         #esqueletos pueden morir
@@ -221,7 +221,7 @@ class Tropa(Carta):
             contexto.registro_eventos.append("Terminó el efecto del Caballero.")
 
         #si barbaros sobreviven al ataque
-        if self.nombre_carta.strip().lower == "barbaros":
+        if self.nombre_carta.strip().lower() == "barbaros":
             if self.ataque_barbaros and self.vida_actual > 0:
                 if contexto.generador_aleatorio() < PROB_BARB:
                     incremento = int(round(self.ataque * POWER_UP_BARB))
