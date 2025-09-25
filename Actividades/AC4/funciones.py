@@ -26,14 +26,17 @@ def obtener_directores(generador_peliculas: Generator) -> Generator:
     """
     Retorna un generador con el nombre de todos los directores.
     """
-    return "COMPLETAR"
+
+
+    return map(lambda Pelicula: Pelicula.director, generador_peliculas)
 
 
 def obtener_str_titulos(generador_peliculas: Generator) -> str:
     """
     Genera un str con todos los títulos de las películas separados por ", ".
     """
-    return "COMPLETAR"
+    titulos = reduce(lambda string, pelicula2: f'{string}, {pelicula2.titulo}', generador_peliculas, '')
+    return titulos[2:]
 
 
 def filtrar_peliculas(
