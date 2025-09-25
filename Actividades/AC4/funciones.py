@@ -48,8 +48,14 @@ def filtrar_peliculas(
     """
     Filtra los elementos del generador de Películas según lo indicado en el input.
     """
-    return "COMPLETAR"
-
+    if director:
+        generador_peliculas = filter(lambda pelicula: pelicula.director == director, generador_peliculas)
+    if rating_min:
+        generador_peliculas = filter(lambda pelicula: pelicula.rating >= rating_min, generador_peliculas)
+    if rating_max:
+        generador_peliculas = filter(lambda pelicula: pelicula.rating <= rating_max, generador_peliculas)
+    return generador_peliculas
+    
 
 def filtrar_titulos(
     generador_peliculas: Generator,
