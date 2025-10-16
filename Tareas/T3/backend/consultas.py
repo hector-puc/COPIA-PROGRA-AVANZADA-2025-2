@@ -51,19 +51,24 @@ def cargar_materiales_mision(path: str) -> Generator[MisionMineral, None, None]:
 
 # Consultas 1 generador
 
-def naves_de_material(generador_naves: Generator[Nave, None, None], material: str) -> Generator[Nave, None, None]:
+def naves_de_material(generador_naves: Generator[Nave, None, None],
+                       material: str) -> Generator[Nave, None, None]:
     pass
 
 
-def misiones_desde_fecha(generador_misiones: Generator[Mision, None, None], fecha: str, inverso: bool) -> Generator[Mision, None, None]:
+def misiones_desde_fecha(generador_misiones: Generator[Mision, None, None], 
+                         fecha: str, inverso: bool) -> Generator[Mision, None, None]:
     pass
 
 
-def naves_por_intervalo_carga(generador_naves: Generator[Nave, None, None], cargas: tuple[float, float]) -> Generator[Nave, None, None]:
+def naves_por_intervalo_carga(generador_naves: Generator[Nave, None, None], 
+                              cargas: tuple[float, float]) -> Generator[Nave, None, None]:
     pass
 
 
-def planetas_con_cantidad_de_minerales(generador_planeta_mineral: Generator[PlanetaMineral, None, None], id_mineral: int, cantidad_minima: int) -> List[int]:
+def planetas_con_cantidad_de_minerales(generador_planeta_mineral: 
+                                       Generator[PlanetaMineral, None, None],
+                                        id_mineral: int, cantidad_minima: int) -> List[int]:
     pass
 
 
@@ -72,7 +77,8 @@ def naves_astronautas_rango(generador_tripulacion: Generator[Tripulacion, None, 
     pass
 
 
-def cambiar_rango_astronauta(generador_tripulacion: Generator[Tripulacion, None, None], id_astronauta: int, rango_astronauta: int) -> Generator[Tripulacion, None, None]:
+def cambiar_rango_astronauta(generador_tripulacion: Generator[Tripulacion, None, None], 
+                             id_astronauta: int, rango_astronauta: int) -> Generator[Tripulacion, None, None]:
     pass
 
 
@@ -93,19 +99,22 @@ def misiones_por_tipo_planeta(generador_misiones: Generator[Mision, None, None],
     pass
 
 
-def naves_pueden_llevar(generador_naves: Generator[Nave, None, None], generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
+def naves_pueden_llevar(generador_naves: Generator[Nave, None, None], 
+                        generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
                         id_planeta: int) -> Generator[tuple[str, int, float], None, None]:
     pass
     
 
 # Consultas 3 generadores
 
-def planetas_por_estadisticas(generador_mineral: Generator[Mineral, None, None], generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
+def planetas_por_estadisticas(generador_mineral: Generator[Mineral, None, None],
+                              generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
                               generador_planeta: Generator[Planeta, None, None], moles_elemento_min: int, 
                               concentracion_molar_min: int, densidad_min: int) -> Generator[Planeta, None, None]:
     pass
 
-def ganancias_potenciales_por_planeta(generador_minerales: Generator[Mineral, None, None], generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
+def ganancias_potenciales_por_planeta(generador_minerales: Generator[Mineral, None, None], 
+                                      generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
                                       generador_planetas: Generator[Planeta, None, None], precios: dict) -> dict:
     pass
 
