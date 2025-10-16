@@ -50,8 +50,21 @@ class DCClub(Thread):
         return True
 
     def preparar_escenario(self) -> bool:
-        # TODO: Parte I
-        pass
+        sonido = Thread(target=self.revisar_mesa_sonido)
+        instrumentos = Thread(target=self.revisar_instrumentos)
+
+        sonido.start()
+        instrumentos.start()
+
+        sonido.join()
+        instrumentos.join()
+
+        if sonido and instrumentos:
+            return True
+
+        else:
+            return False
+
 
     def llegada_cliente(self, cliente: Cliente) -> None:
         self.capacidad_actual += 1
@@ -64,19 +77,38 @@ class DCClub(Thread):
               f'Capacidad actual: {self.capacidad_actual} de {self.capacidad_maxima}')
 
     def manejar_llegada_cliente(self, cliente: Cliente) -> bool:
-        # TODO: Parte I
-        pass
+        llegada = self.lock_capacidad.acquire(blocking=False)
+        if llegada and self.capacidad_actual < self.capacidad_maxima:
+            self.llegada_cliente(cliente)
+            self.lock_capacidad.release()
+            return True
+        elif llegada and self.capacidad_actual >= self.capacidad_maxima:
+            self.lock_capacidad.release()
+            return False
+        else:
+            return False
+#capaz esta mal
 
     def manejar_salida_cliente(self, cliente: Cliente) -> bool:
-        # TODO: Parte I
-        pass
+        salida = self.lock_capacidad.acquire(blocking=False)
+        if salida:
+            self.salida_cliente(cliente)
+            self.lock_capacidad.release()
+            return True
+        else:
+            return False
 
     def run(self) -> None:
         # TODO: Parte I
+
         print('[DCClub]\t Preparando escenario')
+        self.preparar_escenario()
         print('[DCClub]\t Escenario preparado')
+        self.senal_abierto.set()
+        sleep(self.DURACION_CLUB_ABIERTO)
         print('[DCClub]\t Abre el DCClub a los clientes')
         print('[DCClub]\t Cierra el DCClub')
+        self.senal_abierto.clear()
         pass
 
 
@@ -90,7 +122,7 @@ class Cliente(Thread):
     def __init__(self, senal_abrio_club: Event, metodo_llega: Callable,
                  metodo_salida: Callable) -> None:
         super().__init__()
-        self.daemon = None  # TODO: Parte II
+        self.daemon = True  # TODO: Parte II
 
         self.senal_abrio_club = senal_abrio_club
         self.entrar_al_club = metodo_llega
@@ -103,19 +135,31 @@ class Cliente(Thread):
         return random() * self.RANGO_TIEMPO_EN_CLUB + self.MIN_TIEMPO_EN_CLUB
 
     def intentar_entrar_dcclub(self) -> bool:
-        # TODO: Parte II
-        pass
+        while True:
+            entro = self.entrar_al_club(self)
+            if entro:
+                return True
+            sleep(self.TIEMPO_ESPERA_NUEVO_INTENTO)
 
     def intentar_salir_dcclub(self) -> bool:
         # TODO: Parte II
-        pass
+        while True:
+            salir = self.salir_del_club(self)
+            if salir:
+                return True
+            
 
     def run(self) -> None:
         # TODO: Parte II
         print(f'[Cliente {self.id}]\t Esperando para entrar al DCClub')
+        self.senal_abrio_club.wait()
         print(f'[Cliente {self.id}]\t Ahora quiero ingresar al DCClub')
+        self.intentar_entrar_dcclub()
         print(f'[Cliente {self.id}]\t Ya estoy disfrutando del DCClub')
+        tiempo = self.calcular_tiempo_en_club()
+        sleep(tiempo)
         print(f'[Cliente {self.id}]\t Ahora quiero salir al DCClub')
+        self.intentar_salir_dcclub()
         print(f'[Cliente {self.id}]\t Ya me fui del DCClub')
         pass
 
