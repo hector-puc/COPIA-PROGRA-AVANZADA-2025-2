@@ -88,15 +88,8 @@ def cargar_mision(path: str) -> Generator[Mision, None, None]:
         next(archivo)
         for linea in archivo:
             id_mision, fecha, hora, id_equipo, id_planeta, lograda = linea.strip().split(',')
-            yield Mision(int(id_mision),
-                         fecha, 
-                         hora,
-                         int(id_equipo),
-                         int(id_planeta),
-                         lograda)
+            yield Mision(int(id_mision),fecha, hora, int(id_equipo), int(id_planeta), lograda)
             
-
-
 def cargar_materiales_mision(path: str) -> Generator[MisionMineral, None, None]:
     with open(path, "r", encoding='utf-8') as archivo:
         next(archivo)
@@ -116,17 +109,16 @@ def naves_de_material(generador_naves: Generator[Nave, None, None],
             yield nave
 
 
-def misiones_desde_fecha(generador_misiones: Generator[Mision, None, None], 
+def misiones_desde_fecha(generador_misiones: Generator[Mision, None, None], #NO CORRE BIEN POR ALGUNA RAZÓN
                          fecha: str, inverso: bool) -> Generator[Mision, None, None]:
-    if not inverso:
-        for adelante in generador_misiones:
-            if adelante.fecha >= fecha:
-                yield adelante
-    else:
-        for atras in generador_misiones:
-            if atras.fecha <= fecha:
-                yield atras
+    def predicado_hacia_adelante(mision: Mision) -> bool:
+        return mision.fecha >= fecha
 
+    def predicado_hacia_atras(mision: Mision) -> bool:
+        return mision.fecha <= fecha
+
+    predicado_por_fecha = predicado_hacia_atras if inverso else predicado_hacia_adelante
+    return filter(predicado_por_fecha, generador_misiones)
 
 def naves_por_intervalo_carga(generador_naves: Generator[Nave, None, None], 
                               cargas: tuple[float, float]) -> Generator[Nave, None, None]:
@@ -147,48 +139,92 @@ def planetas_con_cantidad_de_minerales(generador_planeta_mineral:
 
 def naves_astronautas_rango(generador_tripulacion: Generator[Tripulacion, None, None], rango: int, 
                             minimo_astronautas: int) -> Generator[Tuple[str, Generator], None, None]:
+    def crear_funcion_acumuladora(rango_corte: int):
 
-    diccionario_patente_a_ids_filtrados = reduce(
-        lambda acumulador_patente_a_ids, tripulacion: (acumulador_patente_a_ids[tripulacion.patente],  
-            acumulador_patente_a_ids[tripulacion.patente].append(tripulacion.id_astronauta)
-                if tripulacion.rango >= rango else None, ) and acumulador_patente_a_ids, 
-                generador_tripulacion, defaultdict(list))  #con esto no explota si no existe 
+        def acumular_por_patente(diccionario_patente_a_ids, registro_tripulacion="Tripulacion"):
+                patente_actual = registro_tripulacion.patente_nave
+                if patente_actual not in diccionario_patente_a_ids:
+                    diccionario_patente_a_ids[patente_actual] = []
+                if registro_tripulacion.rango >= rango_corte:
+                    diccionario_patente_a_ids[patente_actual].append(registro_tripulacion.id_astronauta)
 
-    condicion_minima_cantidad = ((lambda lista_ids_filtrados: True) if minimo_astronautas < 1 
-                                 else (lambda lista_ids_filtrados: len(lista_ids_filtrados) 
-                                       >= minimo_astronautas))
+                return diccionario_patente_a_ids #con esto no retorna none
 
-    for patente, lista_ids_filtrados in diccionario_patente_a_ids_filtrados.items():
-        if condicion_minima_cantidad(lista_ids_filtrados):
-            yield (patente, (id_astronauta for id_astronauta in lista_ids_filtrados))
+        return acumular_por_patente
 
+    funcion_acumuladora = crear_funcion_acumuladora(rango)
 
-def cambiar_rango_astronauta(
-        generador_tripulacion: Generator[Tripulacion, None, None], 
-        id_astronauta: int, rango_astronauta: int
-        ) -> Generator[Tripulacion, None, None]:
-    pass
+    diccionario_patente_a_ids: dict[str, List[int]] = reduce(funcion_acumuladora,
+                                                              generador_tripulacion, {})
 
+    condicion_minima_cantidad = ((lambda lista_ids: True) if minimo_astronautas < 1 
+                                 else (lambda lista_ids: len(lista_ids) >= minimo_astronautas))
+
+    for patente, lista_ids in diccionario_patente_a_ids.items():
+        if condicion_minima_cantidad(lista_ids):
+            yield (patente, (id_astronauta for id_astronauta in lista_ids))
+
+def cambiar_rango_astronauta(generador_tripulacion: Generator[Tripulacion, None, None], 
+        id_astronauta: int, rango_astronauta: int) -> Generator[Tripulacion, None, None]:
+    
+    for tripulacion_nueva in generador_tripulacion:
+        yield ( tripulacion_nueva._replace(rango=rango_astronauta
+                                           ) if tripulacion_nueva.id_astronauta == id_astronauta 
+                                           else tripulacion_nueva)
 
 def encontrar_planetas_cercanos(generador_planetas: Generator[Planeta, None, None], x1: int, 
                                 y1: int, x2: int, y2: int, cantidad: int | None = None
                                 ) -> Generator[Planeta, None, None]:
-    pass
+    if cantidad is not None:
+        for i in range(cantidad):
+            planeta = next(generador_planetas)
+            if ((x1 <= planeta.coordenada_x <= x2) and (y1 <= planeta.coordenada_y <= y2)):
+                yield planeta
+    else:
+        for planeta in generador_planetas:
+            if ((x1 <= planeta.coordenada_x <= x2) and (y1 <= planeta.coordenada_y <= y2)):
+                yield planeta
+            
  
 
 # Consultas 2 generadores
 
+#PARA HACER ESTO: https://www.freecodecamp.org/news/lambda-functions-in-python
+
 def disponibilidad_por_planeta(generador_planeta_mineral: Generator[PlanetaMineral, None, None],
                                generador_planetas: Generator[Planeta, None, None], id_mineral: int
                                ) -> Generator[Tuple[str, int, float], None, None]:
-    pass
+
+    def acumular_planetas(
+    diccionario_id_planeta_a_cantidad: dict[int, float], registro_planeta_mineral: PlanetaMineral): 
+        
+        if registro_planeta_mineral.id_mineral == id_mineral:
+            diccionario_id_planeta_a_cantidad[registro_planeta_mineral.id_planeta] = (
+                registro_planeta_mineral.cantidad_disponible)
+        return diccionario_id_planeta_a_cantidad
+
+    cantidad_planteas = reduce(acumular_planetas, 
+                                            generador_planeta_mineral, {})
+
+    tupla_planeta = lambda planeta: (planeta.nombre, planeta.id_planeta, 
+                                                   float(cantidad_planteas.get(planeta .id_planeta, 0.0)))
+    
+    #PARA HACER UN FOR CON UN YIELD https://es.stackoverflow.com/questions/313174/funcionamiento-de-yield-from
+
+    yield from map(tupla_planeta, generador_planetas)
 
 
-def misiones_por_tipo_planeta(generador_misiones: Generator[Mision, None, None],
+
+def misiones_por_tipo_planeta(generador_misiones: Generator[Mision, None, None], #no corre bien
                               generador_planetas: Generator[Planeta, None, None], tipo: str
                               ) -> Generator[Mision, None, None]:
-    pass
+    
+    generador_filtrado = filter(lambda planeta: planeta.tipo == tipo, generador_planetas)
+    ids_planetas_tipo = map(lambda planeta: planeta.id_planeta, generador_filtrado)
+    set_ids_planetas_tipo = set(ids_planetas_tipo)
 
+    yield from filter(lambda mision: mision.id_planeta in set_ids_planetas_tipo, generador_misiones)
+    
 
 def naves_pueden_llevar(generador_naves: Generator[Nave, None, None], 
                         generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
