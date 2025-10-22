@@ -31,13 +31,10 @@ def cargar_naves(path: str) -> Generator[Nave, None, None]:
     with open(path, "r", encoding="utf-8") as archivo:
         next(archivo)
         for linea in archivo:
-            patente, material, tamano, capacidadd_astronautas, capacidad_minerales, autonomia = linea.strip().split(',')
-            yield Nave(patente, 
-                       material, 
-                       tamano, 
-                       int(capacidadd_astronautas), 
-                       float(capacidad_minerales), 
-                       float(autonomia))
+            (patente, material, tamano, capacidadd_astronautas, capacidad_minerales, autonomia
+             ) = linea.strip().split(',')
+            yield Nave(patente, material, tamano, int(capacidadd_astronautas),
+                        float(capacidad_minerales), float(autonomia))
 
 def cargar_tripulaciones(path: str) -> Generator[Tripulacion, None, None]:
     with open(path, "r", encoding='utf-8') as archivo:
@@ -52,12 +49,7 @@ def cargar_planetas(path: str) -> Generator[Planeta, None, None]:
         next(archivo)
         for linea in archivo:
             id_planeta, nombre, coordenada_x, coordenada_y, tamano, tipo = linea.strip().split(',')
-            yield Planeta(int(id_planeta),
-                          nombre,
-                          float(coordenada_x),
-                          float(coordenada_y),
-                          tamano,
-                          tipo)
+            yield Planeta(int(id_planeta), nombre, float(coordenada_x), float(coordenada_y), tamano, tipo)
 
 
 def cargar_minerales(path: str) -> Generator[Mineral, None, None]:
@@ -65,11 +57,7 @@ def cargar_minerales(path: str) -> Generator[Mineral, None, None]:
         next(archivo)
         for linea in archivo:
             id_mineral, nombre, simbolo_quimico, numero_atomico, masa_atomica = linea.strip().split(',')
-            yield Mineral(int(id_mineral),
-                            nombre,
-                            simbolo_quimico,
-                            int(numero_atomico),
-                            float(masa_atomica))
+            yield Mineral(int(id_mineral), nombre, simbolo_quimico, int(numero_atomico), float(masa_atomica))
 
 
 def cargar_planeta_minerales(path: str) -> Generator[PlanetaMineral, None, None]:
@@ -78,9 +66,7 @@ def cargar_planeta_minerales(path: str) -> Generator[PlanetaMineral, None, None]
         for linea in archivo:
             id_planeta, id_mineral, cantidad_disponible, pureza = linea.strip().split(',')
             yield PlanetaMineral(int(id_planeta),
-                                 int(id_mineral),
-                                 float(cantidad_disponible),
-                                 float(pureza))
+                                 int(id_mineral), float(cantidad_disponible), float(pureza))
 
 
 def cargar_mision(path: str) -> Generator[Mision, None, None]:
@@ -95,9 +81,7 @@ def cargar_materiales_mision(path: str) -> Generator[MisionMineral, None, None]:
         next(archivo)
         for linea in archivo:
             id_mision, id_mineral, cantidad = linea.strip().split(',')
-            yield MisionMineral(int(id_mision),
-                                int(id_mineral),
-                                float(cantidad))
+            yield MisionMineral(int(id_mision), int(id_mineral), float(cantidad))
 
 
 # Consultas 1 generador
@@ -196,11 +180,11 @@ def disponibilidad_por_planeta(generador_planeta_mineral: Generator[PlanetaMiner
                                ) -> Generator[Tuple[str, int, float], None, None]:
 
     def acumular_planetas(
-    diccionario_id_planeta_a_cantidad: dict[int, float], registro_planeta_mineral: PlanetaMineral): 
+    diccionario_id_planeta_a_cantidad: dict[int, float], planeta_mineral: PlanetaMineral): 
         
-        if registro_planeta_mineral.id_mineral == id_mineral:
-            diccionario_id_planeta_a_cantidad[registro_planeta_mineral.id_planeta] = (
-                registro_planeta_mineral.cantidad_disponible)
+        if planeta_mineral.id_mineral == id_mineral:
+            diccionario_id_planeta_a_cantidad[planeta_mineral.id_planeta] = (
+                planeta_mineral.cantidad_disponible)
         return diccionario_id_planeta_a_cantidad
 
     cantidad_planteas = reduce(acumular_planetas, 
@@ -229,8 +213,19 @@ def misiones_por_tipo_planeta(generador_misiones: Generator[Mision, None, None],
 def naves_pueden_llevar(generador_naves: Generator[Nave, None, None], 
                         generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
                         id_planeta: int) -> Generator[tuple[str, int, float], None, None]:
-    pass
     
+    registros_minerales = tuple(filter(
+        lambda planeta_mineral: planeta_mineral.id_planeta == id_planeta, generador_planeta_mineral))
+    
+    for registro_nave in generador_naves:
+        capacidad = float(registro_nave.capacidad_minerales)
+        
+        porcentaje = lambda registro: ((registro_nave.patente, registro.id_mineral, 0.0)
+            if capacidad <= 0.0 or float(registro.cantidad_disponible) <= 0.0
+            else (registro_nave.patente, registro.id_mineral,
+                   min(100.0, (capacidad / float(registro.cantidad_disponible)) * 100.0))) #con el min pasa la correctitud
+
+        yield from map(porcentaje, registros_minerales)
 
 # Consultas 3 generadores
 
@@ -239,7 +234,77 @@ def planetas_por_estadisticas(generador_mineral: Generator[Mineral, None, None],
                               generador_planeta: Generator[Planeta, None, None], moles_elemento_min: int, 
                               concentracion_molar_min: int, densidad_min: int
                               ) -> Generator[Planeta, None, None]:
-    pass
+    
+    diccionario_minerales = dict(map(lambda mineral: (mineral.id_mineral, mineral), 
+                                            generador_mineral))
+    diccionario_planetas = dict(
+        map(lambda planeta: (planeta.id_planeta, planeta), generador_planeta))
+
+    
+    diccionario_volumen_por_planeta = dict(map(lambda lambda_planeta: (
+                lambda_planeta[0],          #id planeta
+                (4.0 / 3.0) * pi * (        #volumen en km3
+                    radio_planeta(lambda_planeta[0],
+                    lambda_planeta[1].tamano) ** 3)) #tamaño planeta
+                    , diccionario_planetas.items())) #el iterable para q sirva el map
+
+    def estadisticas_planetas_acumulado(diccionario_acumulado, registro_planeta_mineral: PlanetaMineral
+        ) -> dict[int, dict[str, object]]:
+
+        id_planeta_actual = registro_planeta_mineral.id_planeta
+        id_mineral_actual = registro_planeta_mineral.id_mineral
+
+        if id_planeta_actual not in diccionario_acumulado:
+            diccionario_acumulado[id_planeta_actual] = {"masa_total": 0.0, "concentracion_molar": {}}
+
+        minerales_calcular = float(registro_planeta_mineral.cantidad_disponible)
+        pureza_decimal = float(registro_planeta_mineral.pureza)
+
+        masa_gramos = minerales_calcular * 1000000.0 #viene en toneladas asi q lo paso a gramos y a float con el.0
+        masa_pura_gramos = masa_gramos * pureza_decimal
+
+        mineral_objeto = diccionario_minerales.get(id_mineral_actual)
+        masa_atomica_mol = float(mineral_objeto.masa_atomica) if mineral_objeto else 0.0
+        moles_actuales = (masa_pura_gramos / masa_atomica_mol) if masa_atomica_mol > 0 else 0.0
+
+        diccionario_acumulado[id_planeta_actual]["masa_total"] = ( #actualzia masa total
+            float(diccionario_acumulado[id_planeta_actual]["masa_total"]) + masa_gramos)
+
+        #suma moles del mineral actual
+        diccionario_moles_por_mineral = diccionario_acumulado[id_planeta_actual]["concentracion_molar"] 
+        diccionario_moles_por_mineral[id_mineral_actual] = (
+            diccionario_moles_por_mineral.get(id_mineral_actual, 0.0) + moles_actuales)
+
+        return diccionario_acumulado
+
+    diccionario_estadisticas_por_planeta = reduce(estadisticas_planetas_acumulado, 
+                                                  generador_planeta_mineral, {})
+
+    def predicado_planeta_cumple(id_planeta: int) -> bool:
+        volumen_km3 = diccionario_volumen_por_planeta.get(id_planeta, 0.0)
+        if volumen_km3 == 0.0:
+            return False
+        
+        info_planeta = diccionario_estadisticas_por_planeta.get(id_planeta)
+        if info_planeta is None:
+            return False
+
+        masa_total = float(info_planeta["masa_total"])  
+        densidad_total = masa_total / volumen_km3
+        if densidad_total < float(densidad_min):
+            return False
+
+        concentracion_molar = info_planeta["concentracion_molar"] 
+
+        def mineral_cumple(moles_elemento: float) -> bool:
+            return (moles_elemento >= float(moles_elemento_min)) and \
+                   ((moles_elemento / volumen_km3) >= float(concentracion_molar_min))
+
+        return any(map(mineral_cumple, concentracion_molar.values()))
+
+    generador_ids_planeta = (i for i in diccionario_estadisticas_por_planeta.keys())
+    yield from map(
+        lambda i: diccionario_planetas[i], filter(predicado_planeta_cumple, generador_ids_planeta))
 
 def ganancias_potenciales_por_planeta(generador_minerales: Generator[Mineral, None, None], 
                                       generador_planeta_mineral: Generator[PlanetaMineral, None, None], 
