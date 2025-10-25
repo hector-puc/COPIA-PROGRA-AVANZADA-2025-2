@@ -481,17 +481,16 @@ def resultado_mision(mision: Mision, generador_naves: Generator[Nave, None, None
         acumulado[identificador_mineral] = acumulado.get(identificador_mineral, 0.0) + cantidad_pura_requerida
         return acumulado
 
-    diccionario_cantidad_pura_requerida_por_mineral = reduce(requerimientos,
-                                                              generador_mision_mineral, {})
+    diccionario_cantidad_pura = reduce(requerimientos, generador_mision_mineral, {})
 
     #si no estan los minerales la mision falla
-    if not diccionario_cantidad_pura_requerida_por_mineral:
+    if not diccionario_cantidad_pura:
         return mision._replace(lograda=False)
 
-    conjunto_minerales_pedidos = set(diccionario_cantidad_pura_requerida_por_mineral.keys())
+    conjunto_minerales_pedidos = set(diccionario_cantidad_pura.keys())
 
     #gatochico id=1
-    gatochico = float(diccionario_cantidad_pura_requerida_por_mineral.get(1, 0.0))
+    gatochico = float(diccionario_cantidad_pura.get(1, 0.0))
     if gatochico > 0.0:
         diccionario_gatochico = dict(map(lambda i: (i.id_equipo, i.patente_nave), generador_tripulaciones))
         patente_nave_objetivo = diccionario_gatochico.get(mision.id_equipo)
@@ -499,7 +498,7 @@ def resultado_mision(mision: Mision, generador_naves: Generator[Nave, None, None
             return mision._replace(lograda=False)
 
         diccionario_capacidad_por_patente = dict(
-            map(lambda n: (n.patente, float(n.capacidad_minerales)), generador_naves))
+            map(lambda i: (i.patente, float(i.capacidad_minerales)), generador_naves))
         capacidad_impura_de_nave = diccionario_capacidad_por_patente.get(patente_nave_objetivo)
         if capacidad_impura_de_nave is None:
             return mision._replace(lograda=False)
@@ -507,22 +506,21 @@ def resultado_mision(mision: Mision, generador_naves: Generator[Nave, None, None
         mision_lograda = (gatochico <= float(capacidad_impura_de_nave))
         return mision._replace(lograda=bool(mision_lograda))
     
-    conjunto_minerales_pedidos = set(diccionario_cantidad_pura_requerida_por_mineral.keys())
+    conjunto_minerales_pedidos = set(diccionario_cantidad_pura.keys())
 
-    def acumulador_planeta(acumulado: dict[int, tuple[float, float]], registro: PlanetaMineral
-                           ) -> dict[int, tuple[float, float]]:
-        if (registro.id_planeta == mision.id_planeta) and (registro.id_mineral in conjunto_minerales_pedidos):
+    def acumulador_planeta(acumulado, registro: PlanetaMineral):
+        if (registro.id_planeta == mision.id_planeta) and (
+            registro.id_mineral in conjunto_minerales_pedidos):
             acumulado[registro.id_mineral] = (float(registro.cantidad_disponible), float(registro.pureza))
         return acumulado
 
-    diccionario_cantidad_impuro_y_pureza_por_mineral = reduce(
-        acumulador_planeta, generador_planeta_mineral, {})
+    diccionario_impuro = reduce(acumulador_planeta, generador_planeta_mineral, {})
 
-    def calcular_impuro_necesario_por_mineral(id_y_cantidad_pura: tuple[int, float]) -> float:
+    def calcular_impuro(id_y_cantidad_pura) -> float:
         id_mineral, cantidad_pura = id_y_cantidad_pura
         if id_mineral == 1:
             return float(cantidad_pura)
-        stock = diccionario_cantidad_impuro_y_pureza_por_mineral.get(id_mineral)
+        stock = diccionario_impuro.get(id_mineral)
         if stock is None:
             return False
         cantidad_impura_disponible, pureza_decimal = stock
@@ -534,15 +532,14 @@ def resultado_mision(mision: Mision, generador_naves: Generator[Nave, None, None
         return impuro_necesario
 
     lista_impuro_necesario = list(
-        map(calcular_impuro_necesario_por_mineral, diccionario_cantidad_pura_requerida_por_mineral.items()))
+        map(calcular_impuro, diccionario_cantidad_pura.items()))
 
     if any(map(lambda x: x == False, lista_impuro_necesario)):
         return mision._replace(lograda = False)
 
-    total_impuro_necesario_toneladas = sum(lista_impuro_necesario)
+    total_impuro_toneladas = sum(lista_impuro_necesario)
 
-    diccionario_gatochico = dict(map(lambda i: (i.id_equipo, i.patente_nave),
-                                           generador_tripulaciones))
+    diccionario_gatochico = dict(map(lambda i: (i.id_equipo, i.patente_nave), generador_tripulaciones))
     patente_nave_objetivo = diccionario_gatochico.get(mision.id_equipo)
     if patente_nave_objetivo is None:
         return mision._replace(lograda=False)
@@ -554,5 +551,5 @@ def resultado_mision(mision: Mision, generador_naves: Generator[Nave, None, None
     if capacidad_impura_de_nave is None:
         return mision._replace(lograda=False)
 
-    mision_lograda = (total_impuro_necesario_toneladas <= float(capacidad_impura_de_nave))
+    mision_lograda = (total_impuro_toneladas <= float(capacidad_impura_de_nave))
     return mision._replace(lograda = bool(mision_lograda))
