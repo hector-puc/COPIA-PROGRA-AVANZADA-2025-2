@@ -16,7 +16,7 @@ SINO QUE SE DEBERÁ EXPLICAR QUÉ SE REALIZO DETALLADAMENTE EN CADA ITEM.
 ⚠️⚠️
 
 #### Desarrollo de la Tarea
-##### 🟠 Test automatizados (PASA TODO A EXCEPCIÓN DE UN ÚNICO TESTCASE QUE NO SUPE ARREGLAR)
+##### 🟠 Test automatizados (PASA TODO A EXCEPCIÓN DE UN ÚNICO TESTCASE QUE NO SUPE ARREGLAR EN LA FUNCION "planetas_por_estadisticas" PERO DE RESTO PASÓ TODO)
 ##### ✅ Ventana de Entrada
 ##### 🟠 Ventana Principal (SOLO ES VISUAL Y POCAS FUNCIONALIDADES)				
 ##### ❌ Ventana Mapa
