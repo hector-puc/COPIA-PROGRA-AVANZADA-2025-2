@@ -79,7 +79,9 @@ class Servidor:
         Cierra el socket de un cliente y lo saca del diccionario de clientes.
         '''
         # TODO: Parte I
-        self.clientes[id_cliente].close()
+        cliente_guardado = self.clientes.get(id_cliente)
+        socket_del_cliente = cliente_guardado[0] if isinstance(cliente_guardado, tuple) else cliente_guardado
+        socket_del_cliente.close()
         del self.clientes[id_cliente]
         print(f'[Cliente {id_cliente}] Cliente desconectado')
 
