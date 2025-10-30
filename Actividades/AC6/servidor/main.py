@@ -65,7 +65,7 @@ class Servidor:
             # TODO: Parte I
 
             socket_clientes, direccion_clientes = self.socket_servidor.accept()
-            self.clientes[id_cliente] = socket_clientes
+            self.clientes[id_cliente] = (socket_clientes, direccion_clientes)
 
             thread_cliente = Thread(
                 target=self.manejar_flujo_cliente,
