@@ -142,5 +142,3 @@ class DCCasillas:
             self.tableros.append(tablero_completo)
 
         return True
-
-

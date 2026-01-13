@@ -55,7 +55,7 @@ class Tablero:
         try:
             filas = int(fila)
             columnas = int(columna)
-        except ValueError:
+        except ValueError: 
             return False
         
         if self.tablero == []:
